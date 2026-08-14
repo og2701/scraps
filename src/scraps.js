@@ -589,7 +589,12 @@
       document.addEventListener('mousedown', onDocDown, true)
     }
 
+    // on touch the native picker is the better control (and iOS opens it
+    // regardless of preventDefault), so the paper menu is pointer-only
+    let lastPointerType = ''
+    select.addEventListener('pointerdown', e => { lastPointerType = e.pointerType })
     select.addEventListener('mousedown', e => {
+      if (lastPointerType === 'touch' || lastPointerType === 'pen') return
       e.preventDefault()
       select.focus()
       if (isOpen) close()
