@@ -67,11 +67,42 @@ check.
 - `data-fx`: `rip · fold · glue · shred`, a paper effect played on click; also
   callable directly as `Scraps.fx.rip(el)` etc. Skipped under reduced motion.
 
+## React
+
+`scraps-ui/react` ships thin components over the same core (React is an
+optional peer dependency; vanilla users never load it):
+
+```jsx
+import { ScrapButton, ScrapToggle, ScrapCard, reseed } from 'scraps-ui/react'
+import 'scraps-ui/scraps.css'
+
+<ScrapCard color="kraft" tape>
+  <ScrapButton color="coral" fx="rip" onClick={save}>rip it</ScrapButton>
+  <ScrapToggle defaultChecked>deckle edges</ScrapToggle>
+</ScrapCard>
+```
+
+Every component renders its real HTML element and cleans up after itself on
+unmount. `ScrapInput`, `ScrapTextarea`, `ScrapSelect`, `ScrapRange`,
+`ScrapCheckbox`, `ScrapRadio`, `ScrapProgress` (with a `value` prop),
+`ScrapChip`, and `ScrapDivider` round out the set.
+
 ## Theming
 
-Override the CSS custom properties on `:root`: `--sc-white`, `--sc-kraft`,
+Override the CSS custom properties on `:root` (`--sc-white`, `--sc-kraft`,
 `--sc-coral`, `--sc-marigold`, `--sc-blue`, `--sc-ink`, `--sc-fringe`,
-`--sc-shadow`, `--sc-text`, `--sc-text-light`.
+`--sc-shadow`, `--sc-text`, `--sc-text-light`) to recolor the stock palette,
+or register entirely new paper colors:
+
+```js
+Scraps.registerColors({
+  brand: '#7A4FBF',
+  night: { fill: '#101418', text: '#F6F1E4' },
+})
+```
+
+Registered names become valid `data-color` values (and `color` props in
+React).
 
 ## License
 

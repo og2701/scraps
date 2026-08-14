@@ -126,6 +126,9 @@
   /* ---------------- attach & paint ---------------- */
 
   const recs = new Set()
+  // listener lifecycles are tied to each rec's AbortController so release()
+  // can tear a component down without tracking handlers individually
+  const sig = rec => (rec.ac ? { signal: rec.ac.signal } : {})
   const ro = typeof ResizeObserver === 'function'
     ? new ResizeObserver(entries => {
         for (const e of entries) if (e.target.__scrapRec) paint(e.target.__scrapRec)
@@ -175,6 +178,7 @@
       shape: o.shape || null,
       n: 0,
       svg: null,
+      ac: typeof AbortController === 'function' ? new AbortController() : null,
     }
     el.__scrapRec = rec
     el.classList.add('scrap', 'scrap-' + type)
@@ -185,8 +189,24 @@
     if (ro) ro.observe(el)
     if (mo) mo.observe(el, { childList: true })
     if (rec.boil) hookBoil(rec)
-    if (ds.fx && FX[ds.fx]) el.addEventListener('click', () => FX[ds.fx](el))
+    if (ds.fx && FX[ds.fx]) el.addEventListener('click', () => FX[ds.fx](el), sig(rec))
     return rec
+  }
+
+  // un-enhance an element and everything scrap-built inside it: aborts
+  // listeners, stops observers, removes injected svgs, frees the records
+  function release (root) {
+    if (!root || !root.querySelectorAll) return
+    const nodes = [root, ...root.querySelectorAll('*')]
+    for (const n of nodes) {
+      const rec = n.__scrapRec
+      if (!rec) continue
+      if (rec.ac) rec.ac.abort()
+      if (ro) ro.unobserve(n)
+      if (rec.svg) rec.svg.remove()
+      recs.delete(rec)
+      delete n.__scrapRec
+    }
   }
 
   function paint (rec) {
@@ -241,12 +261,14 @@
   // while hovered, keep re-tearing so the paper quivers like boiling ink
   function hookBoil (rec) {
     let t = null
+    const stop = () => { clearInterval(t); t = null }
     rec.el.addEventListener('mouseenter', () => {
       if (state.reduced || !state.boil || rec.el.disabled || t) return
       rec.n++; paint(rec)
       t = setInterval(() => { rec.n++; paint(rec) }, 150)
-    })
-    rec.el.addEventListener('mouseleave', () => { clearInterval(t); t = null })
+    }, sig(rec))
+    rec.el.addEventListener('mouseleave', stop, sig(rec))
+    if (rec.ac) rec.ac.signal.addEventListener('abort', stop)
   }
 
   /* ---------------- paper fx ----------------
@@ -480,22 +502,32 @@
 
   function buildField (el) {
     const isRange = el.type === 'range'
-    const wrap = document.createElement('span')
-    wrap.className = isRange
-      ? 'scrap-field-wrap scrap-range-wrap'
-      : 'scrap-field-wrap' +
-        (el.tagName === 'SELECT' ? ' scrap-select' : '') +
-        (el.tagName === 'TEXTAREA' ? ' scrap-area' : '')
+    // a pre-rendered wrapper (React, server HTML) is adopted instead of
+    // re-wrapping, since frameworks break when their nodes get reparented
+    let wrap = el.parentElement && el.parentElement.classList.contains('scrap-field-wrap')
+      ? el.parentElement
+      : null
+    if (!wrap) {
+      wrap = document.createElement('span')
+      wrap.className = 'scrap-field-wrap'
+      el.parentNode.insertBefore(wrap, el)
+      wrap.appendChild(el)
+    }
+    wrap.classList.add('scrap-field-wrap')
+    if (isRange) wrap.classList.add('scrap-range-wrap')
+    if (el.tagName === 'SELECT') wrap.classList.add('scrap-select')
+    if (el.tagName === 'TEXTAREA') wrap.classList.add('scrap-area')
     for (const k of ['color', 'edge', 'seed', 'amp', 'rot', 'boil']) {
       if (el.dataset[k] != null) wrap.dataset[k] = el.dataset[k]
     }
-    el.parentNode.insertBefore(wrap, el)
-    wrap.appendChild(el)
     if (isRange) {
       // a thin torn strip as the track, real range input riding on top
-      const track = document.createElement('span')
-      track.className = 'scrap-range-track'
-      wrap.prepend(track)
+      let track = wrap.querySelector(':scope > .scrap-range-track')
+      if (!track) {
+        track = document.createElement('span')
+        track.className = 'scrap-range-track'
+        wrap.prepend(track)
+      }
       attach(track, 'box', { edge: 'torn', amp: 2.4, color: el.dataset.color || 'kraft', id: el.dataset.seed })
     } else {
       const rec = attach(wrap, 'field')
@@ -509,6 +541,8 @@
     let isOpen = false
     let activeI = -1
     let items = []
+    // a stale menu from a previous enhancement has dead listeners; rebuild
+    wrap.querySelectorAll(':scope > .scrap-menu').forEach(m => m.remove())
     const menu = document.createElement('div')
     menu.className = 'scrap-menu'
     menu.setAttribute('role', 'listbox')
@@ -592,15 +626,15 @@
     // on touch the native picker is the better control (and iOS opens it
     // regardless of preventDefault), so the paper menu is pointer-only
     let lastPointerType = ''
-    select.addEventListener('pointerdown', e => { lastPointerType = e.pointerType })
+    select.addEventListener('pointerdown', e => { lastPointerType = e.pointerType }, sig(menuRec))
     select.addEventListener('mousedown', e => {
       if (lastPointerType === 'touch' || lastPointerType === 'pen') return
       e.preventDefault()
       select.focus()
       if (isOpen) close()
       else openMenu()
-    })
-    menu.addEventListener('mousedown', e => e.preventDefault())
+    }, sig(menuRec))
+    menu.addEventListener('mousedown', e => e.preventDefault(), sig(menuRec))
     select.addEventListener('keydown', e => {
       if (!isOpen) {
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
@@ -614,21 +648,32 @@
       else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(activeI) }
       else if (e.key === 'Escape') { e.preventDefault(); close() }
       else if (e.key === 'Tab') { close() }
-    })
-    select.addEventListener('blur', close)
+    }, sig(menuRec))
+    select.addEventListener('blur', close, sig(menuRec))
   }
 
   function buildChoice (label, kind) {
     const input = label.querySelector('input')
     if (!input) return
     label.classList.add('scrap-choice', 'scrap-' + kind)
-    const box = document.createElement('span')
-    box.className = 'scrap-boxslot'
-    input.after(box)
-    const txt = document.createElement('span')
-    txt.className = 'scrap-choice-text'
-    while (box.nextSibling) txt.appendChild(box.nextSibling)
-    label.appendChild(txt)
+
+    // adopt a pre-rendered structure when present (React renders it itself)
+    let box = label.querySelector(':scope > .scrap-boxslot')
+    if (!box) {
+      box = document.createElement('span')
+      box.className = 'scrap-boxslot'
+      input.after(box)
+      const txt = document.createElement('span')
+      txt.className = 'scrap-choice-text'
+      while (box.nextSibling) txt.appendChild(box.nextSibling)
+      label.appendChild(txt)
+    }
+    let mark = box.querySelector('.scrap-mark')
+    if (!mark) {
+      mark = document.createElement('span')
+      mark.className = 'scrap-mark'
+      box.appendChild(mark)
+    }
 
     const trackColor = label.dataset.color || (kind === 'toggle' ? 'kraft' : 'white')
     const boxRec = attach(box, 'box', {
@@ -638,9 +683,6 @@
       id: label.dataset.seed,
     })
 
-    const mark = document.createElement('span')
-    mark.className = 'scrap-mark'
-    box.appendChild(mark)
     if (kind === 'toggle') {
       attach(mark, 'box', { edge: 'torn', amp: 1.8, color: 'white', id: boxRec.id + '-thumb' })
     } else if (kind === 'radio') {
@@ -655,16 +697,19 @@
         mark.style.translate =
           ((r() * 2 - 1) * 2.5).toFixed(1) + 'px ' + ((r() * 2 - 1) * 2.5).toFixed(1) + 'px'
         paint(markRec)
-      })
+      }, sig(markRec))
     }
   }
 
   function addTape (el, rec) {
-    const r = rng(state.seed, rec.id, 'tapepos')
-    const tape = document.createElement('span')
-    tape.className = 'scrap-tapeslot'
-    tape.style.left = (14 + r() * 48) + '%'
-    el.appendChild(tape)
+    let tape = el.querySelector(':scope > .scrap-tapeslot')
+    if (!tape) {
+      const r = rng(state.seed, rec.id, 'tapepos')
+      tape = document.createElement('span')
+      tape.className = 'scrap-tapeslot'
+      tape.style.left = (14 + r() * 48) + '%'
+      el.appendChild(tape)
+    }
     attach(tape, 'tape', { edge: ['cut', 'torn', 'cut', 'torn'], rot: 9, id: rec.id + '-tape' })
   }
 
@@ -681,10 +726,13 @@
     el.setAttribute('aria-valuemin', '0')
     el.setAttribute('aria-valuemax', '100')
     const rec = attach(el, 'progress', { color: el.dataset.color || 'white' })
-    const fill = document.createElement('span')
-    fill.className = 'scrap-fill'
-    fill.dataset.color = el.dataset.fill || 'coral'
-    el.appendChild(fill)
+    let fill = el.querySelector(':scope > .scrap-fill')
+    if (!fill) {
+      fill = document.createElement('span')
+      fill.className = 'scrap-fill'
+      fill.dataset.color = el.dataset.fill || 'coral'
+      el.appendChild(fill)
+    }
     attach(fill, 'box', { edge: 'torn', amp: 2.2, id: rec.id + '-fill' })
     setProgress(el, el.dataset.value || 0)
   }
@@ -711,6 +759,35 @@
     ;(BUILDERS[type] || BUILDERS.card)(el)
   }
 
+  /* ---------------- custom palettes ---------------- */
+
+  const OK_NAME = /^[a-z][a-z0-9-]*$/i
+  const OK_COLOR = /^[#a-z0-9(),.%\s-]+$/i
+
+  // Scraps.registerColors({ brand: '#7A4FBF', night: { fill: '#101418', text: '#F6F1E4' } })
+  // registered names become valid data-color values
+  function registerColors (map) {
+    let sheet = document.getElementById('scraps-colors')
+    if (!sheet) {
+      sheet = document.createElement('style')
+      sheet.id = 'scraps-colors'
+      document.head.appendChild(sheet)
+    }
+    let css = sheet.textContent
+    for (const name in map) {
+      if (!OK_NAME.test(name)) continue
+      const v = typeof map[name] === 'string' ? { fill: map[name] } : (map[name] || {})
+      if (v.fill && OK_COLOR.test(v.fill)) {
+        css += '\n.scrap--' + name + ' > .scrap-svg .scrap-face{fill:' + v.fill + '}'
+      }
+      if (v.text && OK_COLOR.test(v.text)) {
+        css += '\n.scrap--' + name + '{color:' + v.text + '}'
+        css += '\n.scrap--' + name + ' > .scrap-svg .scrap-grain{fill:#fff}'
+      }
+    }
+    sheet.textContent = css
+  }
+
   /* ---------------- public api ---------------- */
 
   function init (root = document) {
@@ -731,9 +808,12 @@
   return {
     init,
     enhance,
+    attach,
+    release,
     tear,
     reseed,
     setProgress,
+    registerColors,
     fx: FX,
     get seed () { return state.seed },
     get boil () { return state.boil },
