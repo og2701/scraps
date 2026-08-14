@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scraps · swatch book</title>
+<meta name="description" content="Every scrap on the table: the full surface of scraps-ui, rendered live by the real library.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/scraps.css">
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Courier Prime', 'Courier New', monospace;
+    font-size: 16px;
+    line-height: 1.55;
+    color: #E8E3D2;
+    background:
+      radial-gradient(1100px 700px at 50% -10%, rgba(255, 255, 255, 0.055), transparent 60%),
+      repeating-linear-gradient(0deg, transparent 0 47px, rgba(225, 240, 228, 0.075) 47px 48px),
+      repeating-linear-gradient(90deg, transparent 0 47px, rgba(225, 240, 228, 0.075) 47px 48px),
+      #33534A;
+    min-height: 100vh;
+  }
+
+  main {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 0 28px 90px;
+  }
+
+  ::selection { background: #EFA62E; color: #26211A; }
+
+  a.scrap-chip { text-decoration: none; display: inline-block; }
+
+  /* ---------- header ---------- */
+
+  .book-head { padding: 56px 0 10px; }
+
+  .book-title {
+    max-width: 620px;
+    padding: 30px 36px 28px;
+  }
+
+  .book-title h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(34px, 5.4vw, 52px);
+    line-height: 1.05;
+    margin: 0 0 14px;
+  }
+
+  .book-title p { margin: 0; font-size: 15px; }
+
+  .book-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin: 0 0 26px;
+  }
+
+  .book-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 26px;
+  }
+
+  .book-stats .scrap-chip { font-size: 13px; }
+
+  /* ---------- sections ---------- */
+
+  section { margin-top: 70px; }
+
+  .sec-head { margin-bottom: 26px; }
+  .sec-head .scrap-chip { font-size: 15px; text-transform: lowercase; }
+
+  .demo { display: block; padding: 26px 26px 28px; }
+
+  .demo h3 {
+    font-size: 12.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin: 0 0 18px;
+    color: #6B5F4C;
+  }
+
+  .demo h3:not(:first-child) { margin-top: 30px; }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 14px;
+    align-items: center;
+  }
+
+  .row + .row { margin-top: 16px; }
+
+  .cap {
+    display: block;
+    margin-top: 26px;
+    font-size: 13px;
+    color: #6B5F4C;
+  }
+
+  .cap-row { margin: 26px 0 0; }
+  .cap-row .scrap-chip { font-size: 12.5px; }
+
+  .mini-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 26px 22px;
+    align-items: start;
+  }
+
+  .mini-card { padding: 18px 20px; }
+  .mini-card h4 { margin: 0 0 8px; font-size: 15px; }
+  .mini-card p { margin: 0; font-size: 13px; }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 18px 22px;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6B5F4C;
+    margin-bottom: 7px;
+  }
+
+  .choice-cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 26px;
+  }
+
+  .choice-cols .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    align-items: flex-start;
+  }
+
+  .demo label { font-size: 14px; }
+
+  .prog-row {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .prog-row span { font-size: 12.5px; color: #6B5F4C; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .div-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .div-row span { font-size: 12.5px; color: #6B5F4C; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* tear lab */
+  .lab-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: center;
+  }
+
+  @media (max-width: 640px) { .lab-grid { grid-template-columns: 1fr; } }
+
+  .lab-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+  }
+
+  #tearLab {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 22px;
+    padding: 26px 34px;
+  }
+
+  .api-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 24px 20px;
+    align-items: start;
+  }
+
+  .api-card { padding: 16px 18px; }
+  .api-card code { font-weight: 700; font-size: 14px; color: #B03E24; word-break: break-word; }
+  .api-card p { margin: 7px 0 0; font-size: 13px; }
+
+  pre.snippet {
+    margin: 0 0 20px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+
+  footer { margin-top: 90px; text-align: center; }
+</style>
+</head>
+<body>
+
+<main>
+  <header class="book-head">
+    <div class="book-nav">
+      <a data-scrap="chip" data-color="blue" href="./">&larr; back to the mat</a>
+    </div>
+    <div class="book-title" data-scrap="card" data-color="white" data-tape>
+      <h1>every scrap on the table.</h1>
+      <p>
+        the full surface of scraps-ui, rendered live by the real library.
+        nothing here is an imitation: hover to boil, click controls, drag the
+        tear lab.
+      </p>
+    </div>
+    <div class="book-stats" aria-hidden="true">
+      <span data-scrap="chip" data-color="kraft">9 component types</span>
+      <span data-scrap="chip" data-color="kraft">6 built-in colours</span>
+      <span data-scrap="chip" data-color="kraft">2 edge styles</span>
+      <span data-scrap="chip" data-color="kraft">4 paper fx</span>
+    </div>
+  </header>
+
+  <section id="buttons">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">01 · buttons</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+      <h3>Scissor-cut, every colour</h3>
+      <div class="row" id="btn-cut"></div>
+      <h3>Torn override, every colour</h3>
+      <div class="row" id="btn-torn"></div>
+      <h3>States</h3>
+      <div class="row">
+        <button data-scrap="button" data-color="kraft" type="button" disabled>disabled</button>
+        <button data-scrap="button" data-color="white" data-boil="false" type="button">still on hover</button>
+        <button data-scrap="button" data-color="coral" data-fx="rip" type="button">click: fx rip</button>
+        <button data-scrap="button" data-color="blue" data-fx="fold" type="button">click: fx fold</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="chips">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">02 · chips</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+      <h3>Cut</h3>
+      <div class="row" id="chip-cut"></div>
+      <h3>Torn</h3>
+      <div class="row" id="chip-torn"></div>
+    </div>
+  </section>
+
+  <section id="cards">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">03 · cards</span></div>
+    <div class="mini-grid" id="card-grid"></div>
+    <p class="cap-row"><span data-scrap="chip" data-color="kraft">torn by default · odd ones taped · last one cut</span></p>
+  </section>
+
+  <section id="fields">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">04 · fields</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+      <h3>Text inputs, colour sweep</h3>
+      <div class="field-grid" id="input-grid"></div>
+      <h3>Textarea, select, range</h3>
+      <div class="field-grid">
+        <div>
+          <span class="field-label">textarea · kraft</span>
+          <textarea data-scrap="field" data-color="kraft" rows="3">grows vertically; the paper follows via ResizeObserver.</textarea>
+        </div>
+        <div>
+          <span class="field-label">select · marigold</span>
+          <select data-scrap="field" data-color="marigold">
+            <option>torn edge</option>
+            <option>cut edge</option>
+            <option>deckle edge</option>
+          </select>
+        </div>
+        <div>
+          <span class="field-label">range · kraft track</span>
+          <input type="range" data-scrap="field" min="0" max="100" value="60">
+        </div>
+        <div>
+          <span class="field-label">range · coral track</span>
+          <input type="range" data-scrap="field" data-color="coral" min="0" max="100" value="30">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="choices">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">05 · checkboxes, radios &amp; toggles</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+      <div class="choice-cols">
+        <div><h3>Checkbox</h3><div class="choices" id="cb-col"></div></div>
+        <div><h3>Radio</h3><div class="choices" id="rd-col"></div></div>
+        <div><h3>Toggle</h3><div class="choices" id="tg-col"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="progress">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">06 · progress</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+      <h3>Values on a white track</h3>
+      <div id="prog-values"></div>
+      <h3>Every fill at 60%</h3>
+      <div id="prog-fills"></div>
+    </div>
+  </section>
+
+  <section id="dividers">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">07 · dividers</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+      <div id="div-rows"></div>
+    </div>
+  </section>
+
+  <section id="lab">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">08 · tear lab</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+      <div class="lab-grid">
+        <div class="lab-stage">
+          <span data-scrap="chip" data-color="coral" data-seed="tear-lab" id="tearLab">specimen</span>
+        </div>
+        <div>
+          <span class="field-label">tear amplitude · <b id="ampVal">3</b>px</span>
+          <input type="range" data-scrap="field" id="ampRange" min="1" max="12" value="3">
+          <span class="field-label" style="margin-top:18px">crookedness · &plusmn;<b id="rotVal">3</b>&deg;</span>
+          <input type="range" data-scrap="field" data-color="coral" id="rotRange" min="0" max="15" value="3">
+          <span class="cap">drag either control, then hover the specimen: every value on this page is live library behaviour, not artwork.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="colours">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">09 · custom colours</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+<pre class="snippet"><code>Scraps.registerColors({
+  rose:  '#C4587A',
+  moss:  '#5E7348',
+  night: { fill: '#1C2733', text: '#F6F1E4' },
+})</code></pre>
+      <div class="row" id="custom-row"></div>
+      <span class="cap">registered names become data-color values (and color props in react). the stock palette stays themeable through the --sc-* custom properties.</span>
+    </div>
+  </section>
+
+  <section id="api">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">10 · the whole api</span></div>
+    <div class="api-grid" id="api-grid"></div>
+  </section>
+
+  <footer>
+    <a data-scrap="chip" data-color="blue" href="./">&larr; back to the mat</a>
+  </footer>
+</main>
+
+<script src="../src/scraps.js"></script>
+<script>
+  const COLORS = ['white', 'kraft', 'coral', 'marigold', 'blue', 'ink']
+
+  function make (tag, attrs, text) {
+    const e = document.createElement(tag)
+    for (const k in attrs) if (attrs[k] != null) e.setAttribute(k, attrs[k])
+    if (text != null) e.textContent = text
+    return e
+  }
+
+  // buttons and chips: colour sweeps in both edges
+  for (const [edge, btnHost, chipHost] of [['cut', 'btn-cut', 'chip-cut'], ['torn', 'btn-torn', 'chip-torn']]) {
+    for (const c of COLORS) {
+      document.getElementById(btnHost).appendChild(
+        make('button', { 'data-scrap': 'button', 'data-color': c, 'data-edge': edge, type: 'button' }, c))
+      document.getElementById(chipHost).appendChild(
+        make('span', { 'data-scrap': 'chip', 'data-color': c, 'data-edge': edge }, c))
+    }
+  }
+
+  // cards
+  const cardGrid = document.getElementById('card-grid')
+  COLORS.forEach((c, i) => {
+    const card = make('div', {
+      'data-scrap': 'card',
+      'data-color': c,
+      'data-tape': i % 2 ? '' : null,
+      'data-edge': i === COLORS.length - 1 ? 'cut' : null,
+      class: 'demo mini-card',
+    })
+    card.appendChild(make('h4', {}, c + ' stock'))
+    card.appendChild(make('p', {}, i === COLORS.length - 1 ? 'cut-edge override.' : 'torn edges, paper grain, a crooked angle.'))
+    cardGrid.appendChild(card)
+  })
+
+  // inputs
+  const inputGrid = document.getElementById('input-grid')
+  for (const c of COLORS) {
+    const cell = make('div', {})
+    cell.appendChild(make('span', { class: 'field-label' }, 'input · ' + c))
+    cell.appendChild(make('input', { 'data-scrap': 'field', 'data-color': c, placeholder: c + ' paper' }))
+    inputGrid.appendChild(cell)
+  }
+
+  // choices: one of each colour, half checked, last disabled
+  const choiceRows = [
+    ['cb-col', 'checkbox', 'checkbox'],
+    ['rd-col', 'radio', 'radio'],
+    ['tg-col', 'toggle', 'checkbox'],
+  ]
+  for (const [host, kind, inputType] of choiceRows) {
+    COLORS.forEach((c, i) => {
+      const label = make('label', { 'data-scrap': kind, 'data-color': c })
+      const input = make('input', { type: inputType })
+      if (kind === 'radio') input.name = 'sw-' + host
+      if (i % 2) input.checked = true
+      if (i === COLORS.length - 1) input.disabled = true
+      label.appendChild(input)
+      label.appendChild(document.createTextNode(' ' + c + (i === COLORS.length - 1 ? ' · disabled' : i % 2 ? ' · on' : '')))
+      document.getElementById(host).appendChild(label)
+    })
+  }
+
+  // progress
+  const progValues = document.getElementById('prog-values')
+  for (const v of [5, 25, 50, 75, 97]) {
+    const row = make('div', { class: 'prog-row' })
+    row.appendChild(make('span', {}, v + '%'))
+    row.appendChild(make('div', { 'data-scrap': 'progress', 'data-value': v, 'data-fill': 'coral' }))
+    progValues.appendChild(row)
+  }
+  const progFills = document.getElementById('prog-fills')
+  for (const c of COLORS.filter(c => c !== 'white')) {
+    const row = make('div', { class: 'prog-row' })
+    row.appendChild(make('span', {}, c))
+    row.appendChild(make('div', { 'data-scrap': 'progress', 'data-value': 60, 'data-fill': c }))
+    progFills.appendChild(row)
+  }
+
+  // dividers
+  const divRows = document.getElementById('div-rows')
+  for (const c of COLORS) {
+    for (const edge of ['torn', 'cut']) {
+      const row = make('div', { class: 'div-row' })
+      row.appendChild(make('span', {}, c + ' · ' + edge))
+      row.appendChild(make('div', { 'data-scrap': 'divider', 'data-color': c, 'data-edge': edge, role: 'separator' }))
+      divRows.appendChild(row)
+    }
+  }
+
+  // custom colours, registered for real
+  Scraps.registerColors({
+    rose: '#C4587A',
+    moss: '#5E7348',
+    night: { fill: '#1C2733', text: '#F6F1E4' },
+  })
+  const customRow = document.getElementById('custom-row')
+  for (const c of ['rose', 'moss', 'night']) {
+    customRow.appendChild(make('span', { 'data-scrap': 'chip', 'data-color': c }, c))
+    customRow.appendChild(make('button', { 'data-scrap': 'button', 'data-color': c, type: 'button' }, c + ' button'))
+  }
+
+  // api cards
+  const API = [
+    ['Scraps.init(root?)', 'tears everything with a data-scrap attribute.'],
+    ['Scraps.enhance(el)', 'tears one element.'],
+    ['Scraps.attach(el, type, opts)', 'low-level: paper an element with no builder logic.'],
+    ['Scraps.release(el)', 'un-tears an element and frees its listeners and observers.'],
+    ['Scraps.tear(el)', 're-tears one scrap in place.'],
+    ['Scraps.reseed(seed)', 're-tears the whole page; the same seed is pixel-identical anywhere.'],
+    ['Scraps.setProgress(el, pct)', 'moves a progress strip.'],
+    ['Scraps.registerColors(map)', 'mints new paper colours at runtime.'],
+    ['Scraps.fx.rip / fold / glue / shred', 'paper gestures, also wired by data-fx.'],
+    ['Scraps.boil', 'global switch for hover re-tearing.'],
+  ]
+  const apiGrid = document.getElementById('api-grid')
+  for (const [name, blurb] of API) {
+    const card = make('div', { 'data-scrap': 'card', 'data-color': 'white', class: 'api-card' })
+    card.appendChild(make('code', {}, name))
+    card.appendChild(make('p', {}, blurb))
+    apiGrid.appendChild(card)
+  }
+
+  Scraps.init()
+
+  // tear lab: amp and rot are attach-time values, so rebuild the specimen live
+  const lab = document.getElementById('tearLab')
+  const amp = document.getElementById('ampRange')
+  const rot = document.getElementById('rotRange')
+  const relabel = () => {
+    document.getElementById('ampVal').textContent = amp.value
+    document.getElementById('rotVal').textContent = rot.value
+    lab.textContent = 'amp ' + amp.value + 'px · rot ±' + rot.value + '°'
+  }
+  const rebuild = () => {
+    relabel()
+    lab.dataset.amp = amp.value
+    lab.dataset.rot = rot.value
+    Scraps.release(lab)
+    Scraps.enhance(lab)
+  }
+  amp.addEventListener('input', rebuild)
+  rot.addEventListener('input', rebuild)
+  rebuild()
+</script>
+</body>
+</html>
