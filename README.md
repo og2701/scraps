@@ -1,6 +1,6 @@
 # scraps
 
-![scraps, a UI library cut from paper](demo/og.png)
+![scraps, a UI library cut from paper](https://scraps.ogme01.com/og.png)
 
 **Demo: [scraps.ogme01.com](https://scraps.ogme01.com)**
 

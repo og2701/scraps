@@ -16,5 +16,13 @@
     "svg",
     "zero-dependency"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/og2701/scraps.git"
+  },
+  "homepage": "https://scraps.ogme01.com",
+  "bugs": {
+    "url": "https://github.com/og2701/scraps/issues"
+  }
 }
