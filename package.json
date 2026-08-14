@@ -1,10 +1,20 @@
 {
   "name": "scraps-ui",
   "version": "0.1.0",
-  "description": "A UI library where everything is cut and torn paper. Seeded randomness: same seed, same tears. Real HTML underneath. Zero dependencies.",
+  "description": "A UI library where everything is cut and torn paper",
   "main": "src/scraps.js",
   "style": "src/scraps.css",
-  "files": ["src"],
-  "keywords": ["ui", "paper", "torn", "collage", "seeded", "svg", "zero-dependency"],
+  "files": [
+    "src"
+  ],
+  "keywords": [
+    "ui",
+    "paper",
+    "torn",
+    "collage",
+    "seeded",
+    "svg",
+    "zero-dependency"
+  ],
   "license": "MIT"
 }
