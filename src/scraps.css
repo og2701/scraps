@@ -1,0 +1,380 @@
+/*!
+ * scraps companion stylesheet. required.
+ * palette is themeable: override the --sc-* custom properties.
+ */
+
+:root {
+  --sc-white: #F7F3E7;
+  --sc-kraft: #C9A66B;
+  --sc-coral: #E25336;
+  --sc-marigold: #EFA62E;
+  --sc-blue: #3E6FB0;
+  --sc-ink: #26211A;
+  --sc-fringe: #FFFDF4;
+  --sc-text: #2A241C;
+  --sc-text-light: #F6F1E4;
+  --sc-shadow: rgba(12, 22, 16, 0.38);
+}
+
+/* ---------------- base scrap ---------------- */
+
+.scrap {
+  position: relative;
+  display: inline-block;
+  transform: rotate(var(--scrap-rot, 0deg));
+  color: var(--sc-text);
+}
+
+.scrap > *:not(.scrap-svg) {
+  position: relative;
+  z-index: 1;
+}
+
+/* .scrap always has a transform, so it is its own stacking context and the
+   backing paper can sit at z -1 without falling behind ancestors */
+.scrap-svg {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  filter: drop-shadow(1.5px 2.5px 2px var(--sc-shadow));
+}
+
+.scrap-face { fill: var(--sc-white); }
+.scrap-fringe { fill: var(--sc-fringe); }
+.scrap-grain { fill: #000; opacity: 0.055; }
+
+/* paper colors */
+.scrap--white  > .scrap-svg .scrap-face { fill: var(--sc-white); }
+.scrap--kraft  > .scrap-svg .scrap-face { fill: var(--sc-kraft); }
+.scrap--coral  > .scrap-svg .scrap-face { fill: var(--sc-coral); }
+.scrap--marigold > .scrap-svg .scrap-face { fill: var(--sc-marigold); }
+.scrap--blue   > .scrap-svg .scrap-face { fill: var(--sc-blue); }
+.scrap--ink    > .scrap-svg .scrap-face { fill: var(--sc-ink); }
+.scrap--ink { color: var(--sc-text-light); }
+.scrap--ink > .scrap-svg .scrap-grain { fill: #fff; }
+
+/* ---------------- button ---------------- */
+
+.scrap-button {
+  background: none;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.62em 1.15em;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+
+.scrap-button:hover > .scrap-svg {
+  filter: drop-shadow(3px 5px 3.5px var(--sc-shadow));
+}
+
+.scrap-button:active {
+  transform: rotate(var(--scrap-rot, 0deg)) translate(1px, 2px);
+}
+
+.scrap-button:active > .scrap-svg {
+  filter: drop-shadow(0.5px 1px 1px var(--sc-shadow));
+}
+
+.scrap-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  filter: saturate(0.5);
+}
+
+.scrap-button:focus-visible,
+.scrap-chip:focus-visible {
+  outline: 2px dashed var(--sc-ink);
+  outline-offset: 5px;
+}
+
+/* ---------------- chip ---------------- */
+
+.scrap-chip {
+  padding: 0.28em 0.7em;
+  font-weight: 700;
+  font-size: 0.85em;
+  background: none;
+  border: 0;
+}
+
+/* ---------------- card ---------------- */
+
+.scrap-card {
+  display: block;
+  padding: 22px 24px;
+}
+
+.scrap > .scrap-tapeslot {
+  position: absolute;
+  top: -13px;
+  width: 92px;
+  height: 27px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.scrap-tape > .scrap-svg { filter: none; mix-blend-mode: multiply; }
+.scrap-tape > .scrap-svg .scrap-face { fill: rgba(233, 220, 175, 0.62); }
+.scrap-tape > .scrap-svg .scrap-fringe { display: none; }
+.scrap-tape > .scrap-svg .scrap-grain { opacity: 0.09; }
+
+/* ---------------- fields ---------------- */
+
+.scrap-field-wrap {
+  display: block;
+}
+
+.scrap-field-wrap > input,
+.scrap-field-wrap > textarea,
+.scrap-field-wrap > select {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  outline: none;
+  font: inherit;
+  color: inherit;
+  padding: 0.55em 0.85em;
+  box-sizing: border-box;
+}
+
+.scrap-field-wrap > textarea { resize: vertical; min-height: 4.5em; }
+
+/* focus cue: the paper lifts instead of a drawn outline (selects match
+   :focus-visible on mouse focus, so an outline would show on every click) */
+.scrap-field-wrap:focus-within > .scrap-svg,
+.scrap-range-wrap:focus-within .scrap-range-track > .scrap-svg {
+  filter: drop-shadow(2.5px 4px 3px var(--sc-shadow));
+}
+
+.scrap-select > select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.2em;
+  cursor: pointer;
+}
+
+.scrap-select::after {
+  content: '';
+  position: absolute;
+  right: 0.85em;
+  top: 50%;
+  width: 13px;
+  height: 10px;
+  transform: translateY(-50%) rotate(-3deg);
+  background: var(--sc-ink);
+  clip-path: polygon(4% 14%, 96% 2%, 54% 98%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ---------------- checkbox / radio / toggle ---------------- */
+
+.scrap-choice {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65em;
+  cursor: pointer;
+}
+
+.scrap-choice > input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.scrap-checkbox .scrap-boxslot,
+.scrap-radio .scrap-boxslot {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+.scrap-choice .scrap-boxslot > .scrap-mark {
+  position: absolute;
+}
+
+.scrap-checkbox .scrap-boxslot > .scrap-mark,
+.scrap-radio .scrap-boxslot > .scrap-mark {
+  inset: -3px;
+  opacity: 0;
+  transform: scale(1.6) rotate(10deg);
+  transition: transform 0.14s ease-out, opacity 0.1s ease-out;
+}
+
+.scrap-radio .scrap-boxslot > .scrap-mark { inset: 5px; }
+
+.scrap-choice > input:checked ~ .scrap-boxslot > .scrap-mark {
+  opacity: 1;
+  transform: rotate(var(--scrap-rot, 0deg));
+}
+
+.scrap-choice > input:focus-visible ~ .scrap-boxslot {
+  outline: 2px dashed var(--sc-ink);
+  outline-offset: 4px;
+}
+
+.scrap-choice > input:disabled ~ * { opacity: 0.55; }
+.scrap-choice > input:disabled { cursor: not-allowed; }
+
+/* lighter shadow on the mark: it is a small chip of paper */
+.scrap-mark > .scrap-svg { filter: drop-shadow(1px 1.5px 1px var(--sc-shadow)); }
+
+/* toggle */
+
+.scrap-toggle .scrap-boxslot {
+  width: 56px;
+  height: 28px;
+  flex: none;
+}
+
+.scrap-toggle .scrap-boxslot > .scrap-mark {
+  left: 3px;
+  top: 3px;
+  width: 22px;
+  height: 22px;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.scrap-toggle > input:checked ~ .scrap-boxslot > .scrap-mark {
+  transform: translateX(28px);
+}
+
+.scrap-toggle > input:checked ~ .scrap-boxslot > .scrap-svg .scrap-face {
+  fill: var(--sc-blue);
+}
+
+/* ---------------- progress ---------------- */
+
+.scrap-progress {
+  display: block;
+  height: 16px;
+}
+
+.scrap-progress > .scrap-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  z-index: 1;
+}
+
+/* ---------------- divider ---------------- */
+
+.scrap-divider {
+  display: block;
+  height: 10px;
+  margin: 8px 0;
+}
+
+/* ---------------- range input ---------------- */
+
+.scrap-field-wrap > input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 0;
+  height: 30px;
+  cursor: pointer;
+}
+
+.scrap-field-wrap > input[type='range']::-webkit-slider-runnable-track {
+  height: 30px;
+  background: transparent;
+}
+
+.scrap-field-wrap > input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 26px;
+  margin-top: 2px;
+  background: var(--sc-ink);
+  clip-path: polygon(8% 6%, 52% 0%, 94% 10%, 100% 55%, 90% 96%, 40% 100%, 4% 90%, 0% 40%);
+  cursor: grab;
+}
+
+.scrap-field-wrap > input[type='range']::-moz-range-track {
+  height: 30px;
+  background: transparent;
+}
+
+.scrap-field-wrap > input[type='range']::-moz-range-thumb {
+  width: 20px;
+  height: 26px;
+  border: 0;
+  border-radius: 0;
+  background: var(--sc-ink);
+  clip-path: polygon(8% 6%, 52% 0%, 94% 10%, 100% 55%, 90% 96%, 40% 100%, 4% 90%, 0% 40%);
+  cursor: grab;
+}
+
+.scrap-range-wrap {
+  position: relative;
+  display: block;
+  outline: none;
+}
+
+
+
+.scrap-range-wrap > .scrap-range-track {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 9px;
+  height: 12px;
+  display: block;
+  z-index: 0;
+}
+
+/* ---------------- select menu ---------------- */
+
+.scrap > .scrap-menu {
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: calc(100% + 8px);
+  z-index: 30;
+  display: none;
+  padding: 9px;
+}
+
+.scrap-menu.is-open { display: block; }
+
+.scrap-option {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 11px;
+  cursor: pointer;
+}
+
+.scrap > .scrap-option-hl {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.scrap-option-hl > .scrap-svg {
+  filter: drop-shadow(1px 1.5px 1px var(--sc-shadow));
+}
+
+/* ---------------- motion ---------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .scrap-choice .scrap-mark,
+  .scrap-toggle .scrap-boxslot > .scrap-mark {
+    transition: none;
+  }
+}

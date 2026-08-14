@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scraps · a ui library cut from paper</title>
+<meta name="description" content="every mount is a fresh tear from seeded randomness. real HTML underneath. zero dependencies.">
+<meta property="og:title" content="scraps · a ui library cut from paper">
+<meta property="og:description" content="every mount is a fresh tear from seeded randomness. real HTML underneath. zero dependencies.">
+<meta property="og:image" content="https://scraps.ogme01.com/og.png">
+<meta property="og:url" content="https://scraps.ogme01.com">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="../src/scraps.css">
+<style>
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: 'Courier Prime', 'Courier New', monospace;
+    font-size: 16px;
+    line-height: 1.55;
+    color: #E8E3D2;
+    /* self-healing cutting mat */
+    background:
+      radial-gradient(1100px 700px at 50% -10%, rgba(255, 255, 255, 0.055), transparent 60%),
+      repeating-linear-gradient(0deg, transparent 0 47px, rgba(225, 240, 228, 0.075) 47px 48px),
+      repeating-linear-gradient(90deg, transparent 0 47px, rgba(225, 240, 228, 0.075) 47px 48px),
+      #33534A;
+    min-height: 100vh;
+  }
+
+  main {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 0 28px 90px;
+  }
+
+  ::selection { background: #EFA62E; color: #26211A; }
+
+  a { color: #F0C97A; }
+
+  /* ---------- hero ---------- */
+
+  .hero {
+    padding: 72px 0 46px;
+    text-align: center;
+  }
+
+  .wordmark {
+    margin: 0 0 34px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 6px 10px;
+    font-size: clamp(56px, 11vw, 108px);
+  }
+
+  .wordmark .letter {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1em;
+    line-height: 1;
+    padding: 0.06em 0.14em;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  .hero-copy {
+    max-width: 540px;
+    margin: 0 auto 44px;
+    padding: 22px 28px;
+    text-align: center;
+  }
+
+  .tagline {
+    margin: 0 0 10px;
+    font-size: 16.5px;
+  }
+
+  .tagline b { color: #B03E24; }
+
+  .hero-hint {
+    font-size: 13px;
+    color: #6B5F4C;
+    margin: 0;
+  }
+
+  .install {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 26px;
+  }
+
+  .install code {
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  /* ---------- sections ---------- */
+
+  section { margin-top: 84px; }
+
+  .sec-head {
+    margin-bottom: 30px;
+  }
+
+  .sec-head .scrap-chip {
+    font-size: 15px;
+    text-transform: lowercase;
+  }
+
+  /* ---------- seed lab ---------- */
+
+  .lab-card { max-width: 640px; }
+
+  .lab-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px 22px;
+    align-items: end;
+  }
+
+  .lab-row label {
+    flex: 1 1 200px;
+    font-size: 13px;
+  }
+
+  .lab-row .scrap-field-wrap { margin-top: 6px; font-weight: 700; }
+
+  .lab-note {
+    margin: 18px 0 0;
+    font-size: 13.5px;
+    color: #5C5142;
+  }
+
+  /* ---------- gallery ---------- */
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 34px 30px;
+    align-items: start;
+  }
+
+  .demo h3 {
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin: 0 0 18px;
+    color: #6B5F4C;
+  }
+
+  .demo { padding: 26px 26px 28px; }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 12px;
+    align-items: center;
+  }
+
+  .stack > * + * { margin-top: 16px; }
+
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .demo label { font-size: 15px; }
+
+  .field-label {
+    display: block;
+    font-size: 12.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6B5F4C;
+    margin-bottom: 7px;
+  }
+
+  .note-card p { margin: 0; font-size: 14.5px; }
+  .note-card { max-width: 100%; }
+  .note-card h3 { color: #4A3D28; }
+
+  .ink-card h3 { color: #9A8F78; }
+  .ink-card .ink-intro { margin: 0 0 16px; font-size: 14.5px; }
+
+  .aside {
+    margin: 0;
+    font-size: 13px;
+    color: #6B5F4C;
+  }
+
+  .aside-gap { margin-top: 16px; }
+
+  /* ---------- api ---------- */
+
+  .api-card { padding: 30px 34px; }
+
+  .api-card pre {
+    margin: 0;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .api-card .c { color: #8A7A5E; }
+  .api-card .k { color: #B03E24; font-weight: 700; }
+
+  .attr-list {
+    margin: 26px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13.5px;
+    columns: 2;
+    column-gap: 40px;
+  }
+
+  .attr-list li { margin-bottom: 9px; break-inside: avoid; }
+  .attr-list b { color: #B03E24; }
+
+  @media (max-width: 640px) {
+    .attr-list { columns: 1; }
+    .hero { padding-top: 44px; }
+  }
+
+  /* ---------- footer ---------- */
+
+  footer {
+    margin-top: 100px;
+    padding-bottom: 10px;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  footer .strips {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 26px;
+  }
+
+  footer .strips .scrap-divider { width: 90px; }
+</style>
+</head>
+<body>
+
+<main>
+  <header class="hero">
+    <h1 class="wordmark" id="wordmark" aria-label="scraps"></h1>
+    <div class="hero-copy" data-scrap="card" data-color="white">
+      <p class="tagline">
+        a ui library where everything is <b>cut and torn paper</b>. every mount is a
+        fresh tear from seeded randomness. same seed, same scraps, on any machine.
+        real HTML inputs underneath. zero dependencies.
+      </p>
+      <p class="hero-hint">(hover anything. it re-tears itself.)</p>
+    </div>
+    <div class="install" data-scrap="card" data-color="white" data-tape>
+      <code>$ npm i scraps-ui</code>
+      <button data-scrap="chip" data-color="marigold" id="copyBtn" type="button">copy</button>
+    </div>
+  </header>
+
+  <section id="lab">
+    <div class="sec-head">
+      <span data-scrap="chip" data-color="kraft">seed lab</span>
+    </div>
+    <div class="demo lab-card" data-scrap="card" data-color="white" data-tape>
+      <div class="lab-row">
+        <label>seed
+          <input data-scrap="field" data-color="kraft" id="seedInput" value="scraps" spellcheck="false" autocomplete="off">
+        </label>
+        <button data-scrap="button" data-color="coral" id="shuffleBtn" type="button">shuffle seed</button>
+      </div>
+      <p class="lab-note">
+        every tear on this page derives from that one string. type the same seed
+        tomorrow, or on your friend's machine, and you get pixel-identical paper.
+      </p>
+    </div>
+  </section>
+
+  <section id="components">
+    <div class="sec-head">
+      <span data-scrap="chip" data-color="kraft">the drawer</span>
+    </div>
+
+    <div class="grid">
+
+      <div class="demo" data-scrap="card" data-color="white">
+        <h3>Scissor-cut buttons</h3>
+        <div class="row">
+          <button data-scrap="button" data-color="coral" data-fx="rip" type="button">rip it</button>
+          <button data-scrap="button" data-color="marigold" data-fx="glue" type="button">glue it</button>
+          <button data-scrap="button" data-color="blue" data-fx="fold" type="button">fold it</button>
+          <button data-scrap="button" data-color="ink" data-fx="shred" type="button">shred it</button>
+          <button data-scrap="button" data-color="kraft" type="button" disabled>out of glue</button>
+        </div>
+        <p class="aside aside-gap">each one does what it says. go on.</p>
+      </div>
+
+      <div class="demo stack" data-scrap="card" data-color="white">
+        <h3>Fields are real inputs</h3>
+        <div>
+          <span class="field-label">your name</span>
+          <input data-scrap="field" data-color="kraft" placeholder="e. scissorhands">
+        </div>
+        <div>
+          <span class="field-label">paper stock</span>
+          <select data-scrap="field" data-color="kraft">
+            <option>construction, 86gsm</option>
+            <option>kraft, recycled</option>
+            <option>newsprint, stolen</option>
+            <option>cardstock, fancy</option>
+          </select>
+        </div>
+        <div>
+          <span class="field-label">ransom note</span>
+          <textarea data-scrap="field" data-color="kraft" rows="3" placeholder="we have your mascot. bring glitter."></textarea>
+        </div>
+      </div>
+
+      <div class="demo" data-scrap="card" data-color="white">
+        <h3>Choices</h3>
+        <div class="choices">
+          <label data-scrap="checkbox"><input type="checkbox" checked> run with scissors</label>
+          <label data-scrap="checkbox"><input type="checkbox"> eat the paste</label>
+          <label data-scrap="radio"><input type="radio" name="adh" checked> glue stick</label>
+          <label data-scrap="radio"><input type="radio" name="adh"> rubber cement</label>
+          <label data-scrap="radio"><input type="radio" name="adh" disabled> hot glue (banned)</label>
+          <label data-scrap="toggle"><input type="checkbox" checked> left-handed scissors</label>
+          <label data-scrap="toggle"><input type="checkbox"> deckle edges</label>
+        </div>
+      </div>
+
+      <div class="demo stack" data-scrap="card" data-color="white">
+        <h3>Range &amp; progress</h3>
+        <div>
+          <span class="field-label">jaggedness</span>
+          <input type="range" data-scrap="field" min="0" max="100" value="60">
+        </div>
+        <div>
+          <span class="field-label">gluing… <span id="progLabel">0%</span></span>
+          <div data-scrap="progress" data-value="12" data-fill="coral" id="prog"></div>
+        </div>
+        <div data-scrap="divider" data-color="kraft" role="separator"></div>
+        <p class="aside">^ a divider. it is also torn paper. everything is torn paper.</p>
+      </div>
+
+      <div class="demo note-card" data-scrap="card" data-color="kraft" data-tape>
+        <h3>A note, in kraft and tape</h3>
+        <p>
+          compose alerts from cards: kraft paper, a strip of tape, and something
+          worth saying. glue dries in 30 seconds. tearing is forever.
+        </p>
+      </div>
+
+      <div class="demo ink-card" data-scrap="card" data-color="ink">
+        <h3>Dark stock</h3>
+        <p class="ink-intro">
+          black construction paper tears white at the core, so the fringe does
+          the outlining for you.
+        </p>
+        <div class="row">
+          <button data-scrap="button" data-color="coral" type="button">cut anyway</button>
+          <span data-scrap="chip" data-color="white">contrast: fine</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="api">
+    <div class="sec-head">
+      <span data-scrap="chip" data-color="kraft">the api</span>
+    </div>
+    <div class="api-card" data-scrap="card" data-color="white" data-tape>
+<pre><code><span class="c">&lt;!-- 1. include both files. that's the whole install. --&gt;</span>
+&lt;link rel="stylesheet" href="scraps.css"&gt;
+&lt;script src="scraps.js"&gt;&lt;/script&gt;
+
+<span class="c">&lt;!-- 2. mark up real HTML --&gt;</span>
+&lt;button <span class="k">data-scrap</span>="button" <span class="k">data-color</span>="coral"&gt;rip it&lt;/button&gt;
+&lt;label <span class="k">data-scrap</span>="toggle"&gt;&lt;input type="checkbox"&gt; deckle&lt;/label&gt;
+
+<span class="c">// 3. tear</span>
+Scraps.init()
+Scraps.reseed(<span class="k">'zine-04'</span>)   <span class="c">// same seed, same tears</span>
+Scraps.tear(el)             <span class="c">// re-tear one scrap</span>
+Scraps.setProgress(el, 64)</code></pre>
+      <ul class="attr-list">
+        <li><b>data-scrap</b>: button · chip · card · field · checkbox · radio · toggle · progress · divider</li>
+        <li><b>data-color</b>: white · kraft · coral · marigold · blue · ink</li>
+        <li><b>data-edge</b>: torn | cut (each type has an opinion; override it)</li>
+        <li><b>data-seed</b>: pin one element's tear across reseeds</li>
+        <li><b>data-rot</b>: max crookedness, in degrees</li>
+        <li><b>data-tape</b>: (cards) slap a strip of tape on it</li>
+        <li><b>data-boil</b>: "false" to keep a scrap still under the cursor</li>
+        <li><b>data-fx</b>: rip · fold · glue · shred, played on click (also <code>Scraps.fx.rip(el)</code>)</li>
+        <li><b>data-value / data-fill</b>: progress percent and fill color</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <div class="strips" aria-hidden="true">
+      <div data-scrap="divider" data-color="coral"></div>
+      <div data-scrap="divider" data-color="marigold"></div>
+      <div data-scrap="divider" data-color="blue"></div>
+    </div>
+  </footer>
+</main>
+
+<script src="../src/scraps.js"></script>
+<script>
+  // wordmark: each letter is its own scrap of construction paper
+  const WORD = 'scraps'
+  const LETTER_COLORS = ['coral', 'marigold', 'white', 'blue', 'kraft', 'ink']
+  const wm = document.getElementById('wordmark')
+  // ransom notes never cut two letters the same size
+  const LETTER_SCALE = [1, 0.9, 1.06, 0.88, 1.08, 0.94]
+  const LETTER_DROP = [0, 6, -4, 8, -2, 5]
+  WORD.split('').forEach((ch, i) => {
+    const s = document.createElement('span')
+    s.className = 'letter'
+    s.dataset.scrap = 'chip'
+    s.dataset.color = LETTER_COLORS[i % LETTER_COLORS.length]
+    s.dataset.rot = '4'
+    s.dataset.amp = '3.4'
+    s.style.fontSize = (LETTER_SCALE[i % 6]) + 'em'
+    s.style.marginTop = LETTER_DROP[i % 6] + 'px'
+    s.textContent = ch
+    s.setAttribute('aria-hidden', 'true')
+    wm.appendChild(s)
+  })
+
+  Scraps.init()
+
+  // seed lab
+  const seedInput = document.getElementById('seedInput')
+  let deb = null
+  seedInput.addEventListener('input', () => {
+    clearTimeout(deb)
+    deb = setTimeout(() => Scraps.reseed(seedInput.value || 'scraps'), 120)
+  })
+
+  const SEEDS = ['zine-04', 'glue-stick', 'x-acto-11', 'matisse-blue', 'paper-jam',
+    'left-handed', 'washi-77', 'deckle-edge', 'a4-80gsm', 'safety-first',
+    'pulp', 'collage-99', 'origami-crane', 'papier-mache']
+  document.getElementById('shuffleBtn').addEventListener('click', () => {
+    const next = SEEDS[Math.floor(Math.random() * SEEDS.length)] + '-' + Math.floor(Math.random() * 90 + 10)
+    seedInput.value = next
+    Scraps.reseed(next)
+  })
+
+  // copy install command
+  const copyBtn = document.getElementById('copyBtn')
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText('npm i scraps-ui')
+      copyBtn.textContent = 'copied'
+      setTimeout(() => { copyBtn.textContent = 'copy' }, 1200)
+    } catch { copyBtn.textContent = 'nope' }
+  })
+
+  // progress: glue never quite dries
+  const prog = document.getElementById('prog')
+  const progLabel = document.getElementById('progLabel')
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let v = 12, dir = 1
+    setInterval(() => {
+      v += dir * 6
+      if (v >= 97) { v = 97; dir = -1 }
+      if (v <= 8) { v = 8; dir = 1 }
+      Scraps.setProgress(prog, v)
+      progLabel.textContent = Math.round(v) + '%'
+    }, 500)
+  } else {
+    Scraps.setProgress(prog, 64)
+    progLabel.textContent = '64%'
+  }
+</script>
+</body>
+</html>

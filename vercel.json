@@ -1,0 +1,4 @@
+{
+  "buildCommand": "sh scripts/build-site.sh",
+  "outputDirectory": "public"
+}

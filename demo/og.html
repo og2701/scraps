@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>scraps og image</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/scraps.css">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    font-family: 'Courier Prime', monospace;
+    background:
+      radial-gradient(900px 560px at 50% -8%, rgba(255, 255, 255, 0.06), transparent 60%),
+      repeating-linear-gradient(0deg, transparent 0 47px, rgba(225, 240, 228, 0.075) 47px 48px),
+      repeating-linear-gradient(90deg, transparent 0 47px, rgba(225, 240, 228, 0.075) 47px 48px),
+      #33534A;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 44px;
+  }
+  .wordmark {
+    display: flex;
+    gap: 14px;
+    font-size: 150px;
+  }
+  .letter {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1em;
+    line-height: 1;
+    padding: 0.06em 0.14em;
+  }
+  .strip {
+    display: flex;
+    align-items: center;
+    gap: 34px;
+  }
+  .scrap-button { font-size: 26px; }
+  .tag { font-size: 24px; padding: 0.35em 0.8em; }
+  .install {
+    padding: 16px 30px;
+    font-size: 27px;
+    font-weight: 700;
+  }
+  .sub {
+    font-size: 21px;
+    padding: 0.4em 1em;
+  }
+</style>
+</head>
+<body>
+  <div class="wordmark" id="wm"></div>
+  <div class="strip">
+    <button data-scrap="button" data-color="coral">rip it</button>
+    <label data-scrap="checkbox"><input type="checkbox" checked></label>
+    <label data-scrap="toggle"><input type="checkbox" checked></label>
+    <span data-scrap="chip" data-color="ink" class="tag">zero deps</span>
+    <div data-scrap="card" data-color="white" data-tape class="install">$ npm i scraps-ui</div>
+  </div>
+  <span data-scrap="chip" data-color="kraft" class="sub">a ui library cut from paper · seeded randomness · real HTML underneath</span>
+<script src="../src/scraps.js"></script>
+<script>
+  const colors = ['coral', 'marigold', 'white', 'blue', 'kraft', 'ink']
+  const scale = [1, 0.9, 1.06, 0.88, 1.08, 0.94]
+  const drop = [0, 8, -6, 10, -3, 6]
+  'scraps'.split('').forEach((ch, i) => {
+    const s = document.createElement('span')
+    s.className = 'letter'
+    s.dataset.scrap = 'chip'
+    s.dataset.color = colors[i]
+    s.dataset.rot = '4'
+    s.dataset.amp = '3.6'
+    s.style.fontSize = scale[i] + 'em'
+    s.style.marginTop = drop[i] + 'px'
+    s.textContent = ch
+    document.getElementById('wm').appendChild(s)
+  })
+  Scraps.init()
+</script>
+</body>
+</html>
