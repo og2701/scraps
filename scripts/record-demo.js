@@ -1,9 +1,5 @@
-// records the announcement video: a ghost-cursor performance on the live
-// demo (python http.server on 8657). deps: puppeteer-core,
-// puppeteer-screen-recorder, ghost-cursor; needs ffmpeg on PATH.
 const puppeteer = require('puppeteer-core')
 const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder')
-const { createCursor } = require('ghost-cursor')
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
@@ -15,7 +11,6 @@ async function main () {
     defaultViewport: { width: 1280, height: 720, deviceScaleFactor: 2 },
   })
   const page = await browser.newPage()
-  const cursor = createCursor(page)
 
   // visible cursor + click pulse on every page
   await page.evaluateOnNewDocument(() => {
@@ -45,7 +40,7 @@ async function main () {
   })
 
   const glide = async (x, y, ms = 500) => {
-    await cursor.moveTo({ x, y }, { moveSpeed: ms > 1200 ? 25 : ms > 700 ? 55 : 90 })
+    await page.mouse.move(x, y, { steps: Math.max(8, Math.round(ms / 16)) })
   }
   const center = async sel => {
     const el = await page.$(sel)
@@ -58,14 +53,9 @@ async function main () {
     return { x: x + dx, y: y + dy }
   }
   const clickAt = async (sel, ms = 500, dx = 0, dy = 0) => {
-    if (dx || dy) {
-      const p = await glideTo(sel, ms, dx, dy)
-      await sleep(120)
-      await page.mouse.click(p.x, p.y)
-      return
-    }
-    // ghost-cursor: curved approach, clicks a natural point inside the element
-    await cursor.click(sel, { paddingPercentage: 30, moveDelay: 150 })
+    const p = await glideTo(sel, ms, dx, dy)
+    await sleep(120)
+    await page.mouse.click(p.x, p.y)
   }
   const scrollToSel = async (sel, block = 'center') => {
     await page.$eval(sel, (el, block) => el.scrollIntoView({ behavior: 'smooth', block }), block)
@@ -178,12 +168,7 @@ async function main () {
     clickAt('footer a', 700),
   ])
   await page.evaluate(() => document.fonts.ready)
-  await sleep(1200)
-  const wm2 = (await (await page.$('#wordmark')).boundingBox())
-  await glide(wm2.x + wm2.width * 0.15, wm2.y + wm2.height * 0.5, 400)
-  await glide(wm2.x + wm2.width * 0.85, wm2.y + wm2.height * 0.5, 1500)
-  await glide(wm2.x + wm2.width * 0.5, wm2.y + wm2.height + 120, 500)
-  await sleep(1800)
+  await sleep(2600)
 
   await recorder.stop()
   await browser.close()
