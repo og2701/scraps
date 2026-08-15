@@ -52,10 +52,16 @@ async function main () {
     await glide(x + dx, y + dy, ms)
     return { x: x + dx, y: y + dy }
   }
+  const press = async (x, y) => {
+    await page.mouse.move(x, y)
+    await page.mouse.down()
+    await sleep(130)
+    await page.mouse.up()
+  }
   const clickAt = async (sel, ms = 500, dx = 0, dy = 0) => {
     const p = await glideTo(sel, ms, dx, dy)
     await sleep(120)
-    await page.mouse.click(p.x, p.y)
+    await press(p.x, p.y)
   }
   const scrollToSel = async (sel, block = 'center') => {
     await page.$eval(sel, (el, block) => el.scrollIntoView({ behavior: 'smooth', block }), block)
@@ -91,13 +97,16 @@ async function main () {
   const si = await center('#seedInput')
   await glide(si.x, si.y, 700)
   await sleep(150)
-  await page.mouse.click(si.x, si.y)
+  await press(si.x, si.y)
   await page.$eval('#seedInput', el => el.select())
   await sleep(400)
   await page.keyboard.type('zine-04', { delay: 150 })
   await sleep(900)
   await clickAt('#shuffleBtn', 600)
-  await sleep(1100)
+  await sleep(1300)
+  const sb = await center('#shuffleBtn')
+  await press(sb.x, sb.y)
+  await sleep(1300)
 
   // 3. fx buttons
   await scrollToSel('#components .demo')
@@ -108,10 +117,10 @@ async function main () {
   const cb = await cbs[1].boundingBox()
   const cbx = cb.x + cb.width * 0.45, cby = cb.y + cb.height * 0.55
   await glide(cbx, cby, 600)
-  for (let i = 0; i < 4; i++) { await page.mouse.click(cbx, cby); await sleep(650) }
+  for (let i = 0; i < 4; i++) { await press(cbx, cby); await sleep(650) }
   const tg = await (await page.$('.scrap-toggle .scrap-boxslot')).boundingBox()
   await glide(tg.x + tg.width * 0.5, tg.y + tg.height * 0.5, 500)
-  await page.mouse.click(tg.x + tg.width * 0.5, tg.y + tg.height * 0.5)
+  await press(tg.x + tg.width * 0.5, tg.y + tg.height * 0.5)
   await sleep(700)
 
   // 5. the paper dropdown
@@ -126,7 +135,7 @@ async function main () {
   }
   const pick = await opts[1].boundingBox()
   await glide(pick.x + pick.width / 2, pick.y + pick.height / 2, 300)
-  await page.mouse.click(pick.x + pick.width / 2, pick.y + pick.height / 2)
+  await press(pick.x + pick.width / 2, pick.y + pick.height / 2)
   await sleep(700)
 
   // 6. drag the range
