@@ -115,6 +115,7 @@ async function main () {
   await sleep(700)
 
   // 5. the paper dropdown
+  await scrollToSel('.scrap-select select')
   await clickAt('.scrap-select select', 700)
   await sleep(500)
   const opts = await page.$$('.scrap-option')
@@ -129,6 +130,7 @@ async function main () {
   await sleep(700)
 
   // 6. drag the range
+  await scrollToSel('.scrap-range-wrap input')
   const rr = await (await page.$('.scrap-range-wrap input')).boundingBox()
   await glide(rr.x + rr.width * 0.3, rr.y + rr.height / 2, 500)
   await page.mouse.down()
