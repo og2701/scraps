@@ -64,6 +64,11 @@ async function main () {
     await press(p.x, p.y)
   }
   const scrollToSel = async (sel, block = 'center') => {
+    const visible = await page.$eval(sel, el => {
+      const r = el.getBoundingClientRect()
+      return r.top >= 90 && r.bottom <= innerHeight - 60
+    })
+    if (visible) return
     await page.$eval(sel, (el, block) => el.scrollIntoView({ behavior: 'smooth', block }), block)
     await sleep(950)
   }
@@ -102,11 +107,14 @@ async function main () {
   await sleep(400)
   await page.keyboard.type('zine-04', { delay: 150 })
   await sleep(900)
-  await clickAt('#shuffleBtn', 600)
-  await sleep(1300)
   const sb = await center('#shuffleBtn')
-  await press(sb.x, sb.y)
-  await sleep(1300)
+  await glide(sb.x, sb.y, 600)
+  await sleep(150)
+  for (let i = 0; i < 4; i++) {
+    await page.mouse.down(); await sleep(70); await page.mouse.up()
+    await sleep(230)
+  }
+  await sleep(1200)
 
   // 3. fx buttons
   await scrollToSel('#components .demo')
@@ -114,10 +122,10 @@ async function main () {
 
   // 4. checkbox X landings + toggle
   const cbs = await page.$$('.scrap-checkbox .scrap-boxslot')
-  const cb = await cbs[1].boundingBox()
+  const cb = await cbs[0].boundingBox()
   const cbx = cb.x + cb.width * 0.45, cby = cb.y + cb.height * 0.55
   await glide(cbx, cby, 600)
-  for (let i = 0; i < 4; i++) { await press(cbx, cby); await sleep(650) }
+  for (let i = 0; i < 3; i++) { await press(cbx, cby); await sleep(620) }
   const tg = await (await page.$('.scrap-toggle .scrap-boxslot')).boundingBox()
   await glide(tg.x + tg.width * 0.5, tg.y + tg.height * 0.5, 500)
   await press(tg.x + tg.width * 0.5, tg.y + tg.height * 0.5)
