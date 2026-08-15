@@ -1,8 +1,9 @@
-// records the announcement video: a scripted cursor performance on the live
-// demo (python http.server on 8657). run from a folder with
-// puppeteer-core + puppeteer-screen-recorder installed; needs ffmpeg.
+// records the announcement video: a ghost-cursor performance on the live
+// demo (python http.server on 8657). deps: puppeteer-core,
+// puppeteer-screen-recorder, ghost-cursor; needs ffmpeg on PATH.
 const puppeteer = require('puppeteer-core')
 const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder')
+const { createCursor } = require('ghost-cursor')
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
@@ -14,6 +15,7 @@ async function main () {
     defaultViewport: { width: 1280, height: 720, deviceScaleFactor: 2 },
   })
   const page = await browser.newPage()
+  const cursor = createCursor(page)
 
   // visible cursor + click pulse on every page
   await page.evaluateOnNewDocument(() => {
@@ -43,7 +45,7 @@ async function main () {
   })
 
   const glide = async (x, y, ms = 500) => {
-    await page.mouse.move(x, y, { steps: Math.max(8, Math.round(ms / 16)) })
+    await cursor.moveTo({ x, y }, { moveSpeed: ms > 1200 ? 25 : ms > 700 ? 55 : 90 })
   }
   const center = async sel => {
     const el = await page.$(sel)
@@ -56,9 +58,14 @@ async function main () {
     return { x: x + dx, y: y + dy }
   }
   const clickAt = async (sel, ms = 500, dx = 0, dy = 0) => {
-    const p = await glideTo(sel, ms, dx, dy)
-    await sleep(120)
-    await page.mouse.click(p.x, p.y)
+    if (dx || dy) {
+      const p = await glideTo(sel, ms, dx, dy)
+      await sleep(120)
+      await page.mouse.click(p.x, p.y)
+      return
+    }
+    // ghost-cursor: curved approach, clicks a natural point inside the element
+    await cursor.click(sel, { paddingPercentage: 30, moveDelay: 150 })
   }
   const scrollToSel = async (sel, block = 'center') => {
     await page.$eval(sel, (el, block) => el.scrollIntoView({ behavior: 'smooth', block }), block)
@@ -91,8 +98,12 @@ async function main () {
 
   // 2. seed lab: type a seed, then shuffle
   await scrollToSel('#lab')
-  await clickAt('#seedInput', 700)
-  await page.keyboard.down('Meta'); await page.keyboard.press('a'); await page.keyboard.up('Meta')
+  const si = await center('#seedInput')
+  await glide(si.x, si.y, 700)
+  await sleep(150)
+  await page.mouse.click(si.x, si.y)
+  await page.$eval('#seedInput', el => el.select())
+  await sleep(400)
   await page.keyboard.type('zine-04', { delay: 150 })
   await sleep(900)
   await clickAt('#shuffleBtn', 600)
@@ -100,19 +111,17 @@ async function main () {
 
   // 3. fx buttons
   await scrollToSel('#components .demo')
-  await clickAt('[data-fx="rip"]', 600); await sleep(900)
-  await clickAt('[data-fx="fold"]', 450); await sleep(1150)
-  await clickAt('[data-fx="glue"]', 450); await sleep(1100)
-  await clickAt('[data-fx="shred"]', 450); await sleep(1200)
+  await clickAt('[data-fx="rip"]', 600); await sleep(1300)
 
   // 4. checkbox X landings + toggle
   const cbs = await page.$$('.scrap-checkbox .scrap-boxslot')
   const cb = await cbs[1].boundingBox()
-  await glide(cb.x + cb.width / 2, cb.y + cb.height / 2, 600)
-  for (let i = 0; i < 4; i++) { await page.mouse.click(cb.x + cb.width / 2, cb.y + cb.height / 2); await sleep(650) }
+  const cbx = cb.x + cb.width * 0.45, cby = cb.y + cb.height * 0.55
+  await glide(cbx, cby, 600)
+  for (let i = 0; i < 4; i++) { await page.mouse.click(cbx, cby); await sleep(650) }
   const tg = await (await page.$('.scrap-toggle .scrap-boxslot')).boundingBox()
-  await glide(tg.x + tg.width / 2, tg.y + tg.height / 2, 500)
-  await page.mouse.click(tg.x + tg.width / 2, tg.y + tg.height / 2)
+  await glide(tg.x + tg.width * 0.5, tg.y + tg.height * 0.5, 500)
+  await page.mouse.click(tg.x + tg.width * 0.5, tg.y + tg.height * 0.5)
   await sleep(700)
 
   // 5. the paper dropdown
@@ -139,8 +148,10 @@ async function main () {
 
   // 7. into the swatch book
   await scrollToSel('.swatch-link')
-  await clickAt('.swatch-link a', 600)
-  await page.waitForNavigation({ waitUntil: 'networkidle0' }).catch(() => {})
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 }).catch(() => {}),
+    clickAt('.swatch-link a', 600),
+  ])
   await page.evaluate(() => document.fonts.ready)
   await sleep(1100)
 
@@ -162,8 +173,10 @@ async function main () {
   await sleep(600)
 
   // 8. back to the mat, end on the hero + install card
-  await clickAt('footer a', 700)
-  await page.waitForNavigation({ waitUntil: 'networkidle0' }).catch(() => {})
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 }).catch(() => {}),
+    clickAt('footer a', 700),
+  ])
   await page.evaluate(() => document.fonts.ready)
   await sleep(1200)
   const wm2 = (await (await page.$('#wordmark')).boundingBox())
