@@ -1,6 +1,6 @@
 {
   "name": "scraps-ui",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A UI library where everything is cut and torn paper",
   "main": "src/scraps.js",
   "style": "src/scraps.css",
