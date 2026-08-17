@@ -228,6 +228,10 @@
   .skel-wide { width: 75%; }
   .skel-narrow { width: 45%; }
 
+  @media (min-width: 660px) {
+    .grid > .scrap-table-wrap { grid-column: span 2; }
+  }
+
   /* ---------- api ---------- */
 
   .api-card { padding: 30px 34px; }
@@ -402,16 +406,6 @@
         <p class="aside aside-gap">real dialog elements underneath: esc, focus, and the backdrop come free.</p>
       </div>
 
-      <table data-scrap="table">
-        <thead><tr><th>drawer</th><th>state</th></tr></thead>
-        <tbody>
-          <tr><td>scissors</td><td>missing again</td></tr>
-          <tr><td>glue stick</td><td>drying out</td></tr>
-          <tr><td>washi tape</td><td>plenty</td></tr>
-          <tr><td>patience</td><td>seeded</td></tr>
-        </tbody>
-      </table>
-
       <div class="demo" data-scrap="card" data-color="white">
         <h3>Feedback &amp; loading</h3>
         <div class="row">
@@ -423,6 +417,16 @@
           <div data-scrap="skeleton" class="skel-narrow"></div>
         </div>
       </div>
+
+      <table data-scrap="table">
+        <thead><tr><th>drawer</th><th>state</th></tr></thead>
+        <tbody>
+          <tr><td>scissors</td><td>missing again</td></tr>
+          <tr><td>glue stick</td><td>drying out</td></tr>
+          <tr><td>washi tape</td><td>plenty</td></tr>
+          <tr><td>patience</td><td>seeded</td></tr>
+        </tbody>
+      </table>
 
       <div class="demo ink-card" data-scrap="card" data-color="ink">
         <h3>Dark stock</h3>
