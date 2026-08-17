@@ -726,14 +726,21 @@
   }
 
   function buildTable (el) {
-    let wrap = el.parentElement && el.parentElement.classList.contains('scrap-table-wrap')
-      ? el.parentElement
-      : null
+    // paper on the outer wrap, horizontal scrolling on an inner div: overflow
+    // on the paper itself would clip the torn edges
+    let wrap = el.closest('.scrap-table-wrap')
     if (!wrap) {
       wrap = document.createElement('div')
       wrap.className = 'scrap-table-wrap'
       el.parentNode.insertBefore(wrap, el)
       wrap.appendChild(el)
+    }
+    let scroller = wrap.querySelector(':scope > .scrap-table-scroll')
+    if (!scroller) {
+      scroller = document.createElement('div')
+      scroller.className = 'scrap-table-scroll'
+      wrap.appendChild(scroller)
+      scroller.appendChild(el)
     }
     for (const k of ['color', 'edge', 'seed', 'amp', 'rot']) {
       if (el.dataset[k] != null) wrap.dataset[k] = el.dataset[k]

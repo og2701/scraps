@@ -18,14 +18,16 @@ export const ScrapTable = React.forwardRef<HTMLTableElement, ScrapTableProps>(
         className={['scrap-table-wrap', wrapClassName].filter(Boolean).join(' ')}
         style={wrapStyle}
       >
-        <table
-          data-scrap="table"
-          {...scrapData({ color, edge, seed, rot, amp })}
-          {...props}
-          ref={ref}
-        >
-          {children}
-        </table>
+        <div className="scrap-table-scroll">
+          <table
+            data-scrap="table"
+            {...scrapData({ color, edge, seed, rot, amp })}
+            {...props}
+            ref={ref}
+          >
+            {children}
+          </table>
+        </div>
       </div>
     )
   }

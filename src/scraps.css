@@ -552,8 +552,9 @@ dialog.scrap-dialog[data-side='left'] { margin-right: auto; }
 .scrap-table-wrap {
   display: block;
   padding: 20px 22px;
-  overflow-x: auto;
 }
+
+.scrap-table-wrap > .scrap-table-scroll { overflow-x: auto; }
 
 .scrap-table-wrap table {
   border-collapse: collapse;

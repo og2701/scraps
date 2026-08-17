@@ -195,12 +195,12 @@ export const ScrapTable = forwardRef(function ScrapTable (props, fref) {
   return h('div', {
     className: 'scrap-table-wrap' + (wrapClassName ? ' ' + wrapClassName : ''),
     style: wrapStyle,
-  }, h('table', {
+  }, h('div', { className: 'scrap-table-scroll' }, h('table', {
     'data-scrap': 'table',
     ...dataProps({ color, edge, seed, rot, amp }),
     ...rest,
     ref,
-  }, children))
+  }, children)))
 })
 
 export const ScrapAvatar = forwardRef(function ScrapAvatar (props, fref) {
