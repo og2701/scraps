@@ -355,6 +355,20 @@
 })</code></pre>
       <div class="row" id="custom-row"></div>
       <span class="cap">registered names become data-color values (and color props in react). the stock palette stays themeable through the --sc-* custom properties.</span>
+
+      <h3>Tailwind v4</h3>
+<pre class="snippet"><code>@import "tailwindcss";
+@import "scraps-ui/tailwind.css";
+
+@theme {
+  /* your tokens become the paper: this recolors
+     bg-scrap-coral AND every coral scrap */
+  --color-scrap-coral: #FF5088;
+}</code></pre>
+
+      <h3>shadcn</h3>
+<pre class="snippet"><code>npx shadcn@latest add https://scraps.ogme01.com/r/scraps.json</code></pre>
+      <span class="cap">copies the typed react components into your project (components/ui, lib/scraps-core.ts) with scraps-ui as the engine dependency. single components: /r/scrap-button.json and friends.</span>
     </div>
   </section>
 

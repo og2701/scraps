@@ -244,6 +244,23 @@
   .attr-list li { margin-bottom: 9px; break-inside: avoid; }
   .attr-list b { color: #B03E24; }
 
+  .also {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 14px;
+    align-items: center;
+  }
+
+  .also a.scrap-chip { text-decoration: none; }
+
+  .also-note {
+    font-size: 13px;
+    color: #6B5F4C;
+  }
+
+  .also-note a { color: #B03E24; }
+
   @media (max-width: 640px) {
     .attr-list { columns: 1; }
     .hero { padding-top: 44px; }
@@ -426,6 +443,12 @@ Scraps.setProgress(el, 64)</code></pre>
         <li><b>data-fx</b>: rip · fold · glue · shred, played on click (also <code>Scraps.fx.rip(el)</code>)</li>
         <li><b>data-value / data-fill</b>: progress percent and fill color</li>
       </ul>
+      <div class="also">
+        <a data-scrap="chip" data-color="ink" href="https://github.com/og2701/scraps#react">+ react</a>
+        <a data-scrap="chip" data-color="blue" href="https://github.com/og2701/scraps#tailwind">+ tailwind</a>
+        <a data-scrap="chip" data-color="coral" href="https://github.com/og2701/scraps#shadcn">+ shadcn</a>
+        <span class="also-note">typed components, theme tokens, a copy-paste registry. recipes in the readme; code in the <a href="swatch-book.html#colours">swatch book</a>.</span>
+      </div>
     </div>
   </section>
 
