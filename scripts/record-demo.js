@@ -17,8 +17,11 @@ async function main () {
     addEventListener('DOMContentLoaded', () => {
       const c = document.createElement('div')
       c.innerHTML = '<svg width="26" height="30" viewBox="0 0 26 30"><path d="M2 2 L2 24 L8 19 L12 28 L16 26 L12 17 L20 17 Z" fill="#1E1A14" stroke="#FFFDF4" stroke-width="2"/></svg>'
-      Object.assign(c.style, { position: 'fixed', zIndex: 99999, pointerEvents: 'none', left: '-60px', top: '-60px' })
+      c.setAttribute('popover', 'manual')
       document.body.appendChild(c)
+      Object.assign(c.style, { position: 'fixed', inset: 'auto', margin: '0', border: '0', padding: '0', background: 'transparent', overflow: 'visible', zIndex: 99999, pointerEvents: 'none', left: '-60px', top: '-60px' })
+      try { c.showPopover() } catch (e) {}
+      setInterval(() => { try { c.hidePopover(); c.showPopover() } catch (e) {} }, 300)
       addEventListener('mousemove', e => { c.style.left = e.clientX + 'px'; c.style.top = e.clientY + 'px' }, true)
       addEventListener('mousedown', e => {
         const p = document.createElement('div')
@@ -29,7 +32,10 @@ async function main () {
           borderRadius: '50%', border: '2.5px solid rgba(30,26,20,.6)',
           transition: 'all .45s ease-out',
         })
+        p.setAttribute('popover', 'manual')
         document.body.appendChild(p)
+        Object.assign(p.style, { inset: 'auto', background: 'transparent' })
+        try { p.showPopover() } catch (e) {}
         requestAnimationFrame(() => {
           p.style.width = '46px'; p.style.height = '46px'
           p.style.margin = '-23px 0 0 -23px'; p.style.opacity = '0'
@@ -155,7 +161,44 @@ async function main () {
   await page.mouse.up()
   await sleep(600)
 
-  // 7. into the swatch book
+  // 7. overlays: dialog, menu, tooltip
+  await scrollToSel('#dlgBtn')
+  await clickAt('#dlgBtn', 600)
+  await sleep(1000)
+  await clickAt('#homeDialog [data-close]', 500)
+  await sleep(500)
+  await clickAt('[data-menu]', 500)
+  await sleep(450)
+  const items = await page.$$('#homeMenu .scrap-option')
+  for (const i of [0, 1, 2]) {
+    const b = await items[i].boundingBox()
+    await glide(b.x + b.width / 2, b.y + b.height / 2, 260)
+    await sleep(210)
+  }
+  const mi = await items[1].boundingBox()
+  await glide(mi.x + mi.width / 2, mi.y + mi.height / 2, 220)
+  await press(mi.x + mi.width / 2, mi.y + mi.height / 2)
+  await sleep(400)
+  const tipChip = await center('[data-tip]')
+  await glide(tipChip.x, tipChip.y, 550)
+  await sleep(1200)
+
+  // 8. toasts glue in, one gets dismissed by hand
+  const tb = await center('#homeToast')
+  await glide(tb.x, tb.y, 500)
+  await press(tb.x, tb.y)
+  await sleep(550)
+  await press(tb.x, tb.y)
+  await sleep(900)
+  const toastEl = await page.$('.scrap-toast')
+  if (toastEl) {
+    const b = await toastEl.boundingBox()
+    await glide(b.x + b.width / 2, b.y + b.height / 2, 450)
+    await press(b.x + b.width / 2, b.y + b.height / 2)
+    await sleep(650)
+  }
+
+  // 9. into the swatch book
   await scrollToSel('.swatch-link')
   await Promise.all([
     page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 }).catch(() => {}),
