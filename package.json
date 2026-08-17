@@ -1,6 +1,6 @@
 {
   "name": "scraps-ui",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A UI library where everything is cut and torn paper",
   "main": "src/scraps.js",
   "style": "src/scraps.css",
@@ -8,14 +8,17 @@
     "src"
   ],
   "keywords": [
-    "ui",
-    "paper",
-    "torn",
     "collage",
+    "paper",
+    "react",
     "seeded",
+    "shadcn",
     "svg",
-    "zero-dependency",
-    "react"
+    "tailwind",
+    "torn",
+    "typescript",
+    "ui",
+    "zero-dependency"
   ],
   "license": "MIT",
   "repository": {
@@ -27,10 +30,17 @@
     "url": "https://github.com/og2701/scraps/issues"
   },
   "exports": {
-    ".": "./src/scraps.js",
-    "./react": "./src/react.js",
+    ".": {
+      "types": "./src/scraps.d.ts",
+      "default": "./src/scraps.js"
+    },
+    "./react": {
+      "types": "./src/react.d.ts",
+      "default": "./src/react.js"
+    },
     "./scraps.css": "./src/scraps.css",
     "./styles.css": "./src/scraps.css",
+    "./tailwind.css": "./src/tailwind.css",
     "./src/*": "./src/*",
     "./package.json": "./package.json"
   },
@@ -41,5 +51,9 @@
     "react": {
       "optional": true
     }
-  }
+  },
+  "types": "./src/scraps.d.ts",
+  "sideEffects": [
+    "*.css"
+  ]
 }

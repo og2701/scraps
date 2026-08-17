@@ -1,0 +1,30 @@
+/*!
+ * scraps-ui/tailwind.css — Tailwind v4 bridge.
+ * Import this INSTEAD of scraps.css in a Tailwind project:
+ *
+ *   @import "tailwindcss";
+ *   @import "scraps-ui/tailwind.css";
+ *
+ * You get the paper palette as Tailwind color tokens (bg-scrap-coral,
+ * text-scrap-ink, ...) and scraps reads those same tokens back, so
+ * overriding --color-scrap-* in your @theme recolors the paper too.
+ */
+@import './scraps.css';
+
+@theme {
+  --color-scrap-white: #F7F3E7;
+  --color-scrap-kraft: #C9A66B;
+  --color-scrap-coral: #E25336;
+  --color-scrap-marigold: #EFA62E;
+  --color-scrap-blue: #3E6FB0;
+  --color-scrap-ink: #26211A;
+}
+
+:root {
+  --sc-white: var(--color-scrap-white);
+  --sc-kraft: var(--color-scrap-kraft);
+  --sc-coral: var(--color-scrap-coral);
+  --sc-marigold: var(--color-scrap-marigold);
+  --sc-blue: var(--color-scrap-blue);
+  --sc-ink: var(--color-scrap-ink);
+}

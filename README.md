@@ -87,6 +87,34 @@ unmount. `ScrapInput`, `ScrapTextarea`, `ScrapSelect`, `ScrapRange`,
 `ScrapCheckbox`, `ScrapRadio`, `ScrapProgress` (with a `value` prop),
 `ScrapChip`, and `ScrapDivider` round out the set.
 
+## Tailwind
+
+In a Tailwind v4 project, import the bridge instead of the plain stylesheet:
+
+```css
+@import "tailwindcss";
+@import "scraps-ui/tailwind.css";
+```
+
+The paper palette becomes Tailwind color tokens (`bg-scrap-coral`,
+`text-scrap-ink`, ...) and scraps reads the same tokens back, so overriding
+`--color-scrap-*` in your `@theme` recolors both your utilities and the
+paper.
+
+## shadcn
+
+scraps hosts a [shadcn](https://ui.shadcn.com) registry, so you can copy the
+typed React components straight into your project and own the source:
+
+```sh
+npx shadcn@latest add https://scraps.ogme01.com/r/scraps.json
+```
+
+That installs the whole drawer (components in `components/ui/`, the shared
+hook in `lib/scraps-core.ts`, `scraps-ui` as the engine dependency). Single
+components work too: `.../r/scrap-button.json`, `scrap-card`, `scrap-chip`,
+`scrap-field`, `scrap-choice`, `scrap-progress`.
+
 ## Theming
 
 Override the CSS custom properties on `:root` (`--sc-white`, `--sc-kraft`,
