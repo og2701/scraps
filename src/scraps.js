@@ -664,11 +664,14 @@
       closed = true
       const done = () => { release(t); t.remove() }
       if (state.reduced) return done()
-      t.animate(
-        [{ transform: 'none', opacity: 1 }, { transform: 'translateY(-10px) rotate(-6deg)', opacity: 0 }],
-        { duration: 300, easing: 'ease-in' }
-      )
-      setTimeout(done, 320)
+      // fill forwards, or the toast pops back for a frame before removal;
+      // the margin collapse slides the rest of the stack up smoothly
+      t.animate([
+        { transform: 'none', opacity: 1, marginBottom: '0px' },
+        { transform: 'translateY(-10px) rotate(-6deg)', opacity: 0, marginBottom: '0px', offset: 0.65 },
+        { transform: 'translateY(-10px) rotate(-6deg)', opacity: 0, marginBottom: (-t.offsetHeight - 16) + 'px' },
+      ], { duration: 430, easing: 'ease-in', fill: 'forwards' })
+      setTimeout(done, 450)
     }
     if (o.duration !== 0) setTimeout(close, o.duration || 4000)
     t.addEventListener('click', close, sig(rec))
