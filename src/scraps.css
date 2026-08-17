@@ -400,6 +400,14 @@ dialog.scrap-dialog {
   max-width: min(30em, calc(100vw - 80px));
 }
 
+/* .scrap's position: relative would override the UA's fixed positioning for
+   open modals, dropping the dialog into the page flow */
+dialog.scrap-dialog[open] {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+}
+
 dialog.scrap-dialog::backdrop {
   background: rgba(16, 28, 22, 0.55);
 }
