@@ -144,6 +144,23 @@
 
 .scrap-field-wrap > textarea { resize: vertical; min-height: 4.5em; }
 
+/* fields need reading contrast (and a visible caret): light text on the
+   darker papers, and placeholders as faded ink of whatever the text is */
+.scrap-field-wrap.scrap--coral,
+.scrap-field-wrap.scrap--blue {
+  color: var(--sc-text-light);
+}
+
+.scrap-field-wrap ::placeholder {
+  color: currentColor;
+  opacity: 0.55;
+}
+
+.scrap-field-wrap > input,
+.scrap-field-wrap > textarea {
+  caret-color: currentColor;
+}
+
 /* focus cue: the paper lifts instead of a drawn outline (selects match
    :focus-visible on mouse focus, so an outline would show on every click) */
 .scrap-field-wrap:focus-within > .scrap-svg,
