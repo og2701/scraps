@@ -218,6 +218,16 @@
 
   .aside-gap { margin-top: 16px; }
 
+  .skel-stack {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .skel-wide { width: 75%; }
+  .skel-narrow { width: 45%; }
+
   /* ---------- api ---------- */
 
   .api-card { padding: 30px 34px; }
@@ -390,6 +400,39 @@
         </p>
       </div>
 
+      <div class="demo" data-scrap="card" data-color="white">
+        <h3>Overlays</h3>
+        <div class="row">
+          <button data-scrap="button" data-color="coral" id="dlgBtn" type="button">open a dialog</button>
+          <button data-scrap="button" data-color="marigold" data-menu="#homeMenu" type="button">a menu</button>
+          <span data-scrap="chip" data-color="blue" data-tip="a scrap of context, torn fresh each time" tabindex="0">tooltip</span>
+        </div>
+        <p class="aside aside-gap">real dialog elements underneath: esc, focus, and the backdrop come free.</p>
+      </div>
+
+      <table data-scrap="table">
+        <thead><tr><th>drawer</th><th>state</th></tr></thead>
+        <tbody>
+          <tr><td>scissors</td><td>missing again</td></tr>
+          <tr><td>glue stick</td><td>drying out</td></tr>
+          <tr><td>washi tape</td><td>plenty</td></tr>
+          <tr><td>patience</td><td>seeded</td></tr>
+        </tbody>
+      </table>
+
+      <div class="demo" data-scrap="card" data-color="white">
+        <h3>Feedback &amp; loading</h3>
+        <div class="row">
+          <button data-scrap="button" data-color="ink" id="homeToast" type="button">glue a toast</button>
+          <span><img data-scrap="avatar" src="favicon.svg" width="56" height="56" alt="a torn scrap of coral paper"></span>
+        </div>
+        <div class="skel-stack">
+          <div data-scrap="skeleton" class="skel-wide"></div>
+          <div data-scrap="skeleton"></div>
+          <div data-scrap="skeleton" class="skel-narrow"></div>
+        </div>
+      </div>
+
       <div class="demo ink-card" data-scrap="card" data-color="ink">
         <h3>Dark stock</h3>
         <p class="ink-intro">
@@ -404,6 +447,17 @@
 
     </div>
   </section>
+
+  <dialog data-scrap="dialog" data-tape id="homeDialog">
+    <h3 style="margin:0 0 10px">a torn sheet over the mat</h3>
+    <p style="margin:0 0 18px;font-size:14.5px">it re-tears on every open. press esc, or:</p>
+    <button data-scrap="button" data-color="coral" data-close type="button">close it</button>
+  </dialog>
+  <div data-scrap="menu" id="homeMenu">
+    <button type="button">cut</button>
+    <button type="button">copy</button>
+    <button type="button">shred forever</button>
+  </div>
 
   <p class="swatch-link"><a data-scrap="chip" data-color="blue" href="swatch-book.html">every permutation: the swatch book &rarr;</a></p>
 
@@ -504,6 +558,18 @@ Scraps.setProgress(el, 64)</code></pre>
       copyBtn.textContent = 'copied'
       setTimeout(() => { copyBtn.textContent = 'copy' }, 1200)
     } catch { copyBtn.textContent = 'nope' }
+  })
+
+  // overlays and feedback
+  document.getElementById('dlgBtn').addEventListener('click', () => {
+    const d = document.getElementById('homeDialog')
+    Scraps.tear(d)
+    d.showModal()
+  })
+  const HOME_TOASTS = ['glued.', 'stuck the landing.', 'fresh from the pad.']
+  let hti = 0
+  document.getElementById('homeToast').addEventListener('click', () => {
+    Scraps.toast(HOME_TOASTS[hti++ % HOME_TOASTS.length])
   })
 
   // progress: glue never quite dries
