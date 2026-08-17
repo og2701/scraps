@@ -35,6 +35,8 @@ export interface ScrapsApi {
   setProgress(el: HTMLElement, pct: number): void
   /** mints new paper colours at runtime */
   registerColors(map: Record<string, string | { fill: string; text?: string }>): void
+  /** glues a paper toast into the corner; returns a close function */
+  toast(msg: string, opts?: { color?: string; duration?: number }): () => void
   fx: {
     rip(el: HTMLElement): void
     fold(el: HTMLElement): void

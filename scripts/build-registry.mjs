@@ -22,6 +22,13 @@ const components = [
   { name: 'scrap-field', title: 'Scrap Fields', description: 'Input, textarea, select (with the paper dropdown), and range on paper.', file: 'scrap-field.tsx' },
   { name: 'scrap-choice', title: 'Scrap Choices', description: 'Checkbox, radio, and toggle as paper chips. The X lands differently on every check.', file: 'scrap-choice.tsx' },
   { name: 'scrap-progress', title: 'Scrap Progress', description: 'A torn strip of progress.', file: 'scrap-progress.tsx' },
+  { name: 'scrap-dialog', title: 'Scrap Dialog', description: 'A native dialog as a torn sheet taped over a dimmed mat; data-side makes it a sheet.', file: 'scrap-dialog.tsx' },
+  { name: 'scrap-menu', title: 'Scrap Menu', description: 'A floating paper menu panel opened by any data-menu trigger.', file: 'scrap-menu.tsx' },
+  { name: 'scrap-tabs', title: 'Scrap Tabs', description: 'Folder-tab paper tabs over torn panels.', file: 'scrap-tabs.tsx' },
+  { name: 'scrap-accordion', title: 'Scrap Accordion', description: 'Native details/summary on paper that re-tears as it opens.', file: 'scrap-accordion.tsx' },
+  { name: 'scrap-table', title: 'Scrap Table', description: 'A real table on ruled paper.', file: 'scrap-table.tsx' },
+  { name: 'scrap-avatar', title: 'Scrap Avatar', description: 'An image torn out along a seeded edge with a white fringe.', file: 'scrap-avatar.tsx' },
+  { name: 'scrap-feedback', title: 'Scrap Feedback', description: 'Toast (glued to the corner) plus alert and skeleton.', file: 'scrap-feedback.tsx' },
 ]
 
 const item = (meta, files, registryDependencies) => ({

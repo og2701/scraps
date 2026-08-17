@@ -49,11 +49,22 @@ Real HTML inputs underneath. Zero dependencies. Two files.
 | `checkbox` / `radio` / `toggle` | `<label>` wrapping an `<input>` | cut / torn |
 | `progress` | `<div data-value="40" data-fill="coral">` | torn |
 | `divider` | `<div>` | torn |
+| `dialog` | native `<dialog>` (also sheets via `data-side="right"`) | torn |
+| `menu` | a panel of buttons, opened by any `data-menu="#id"` trigger | torn |
+| `tabs` | `[data-tab]` buttons + `[data-panel]` panels | cut / torn |
+| `accordion` | native `<details>`/`<summary>` | torn |
+| `table` | a real `<table>` on ruled paper | torn |
+| `avatar` | `<img>` torn out along a seeded edge | torn |
+| `skeleton` | `<div>` that slowly re-tears while loading | torn |
+| `alert` | kraft paper, tape, and `role="alert"` | torn |
 
 Selects open a paper dropdown instead of the native popup; the real
 `<select>` keeps the value, the change events, and the keyboard focus.
 Checkbox X marks land at a slightly different angle and position on every
-check.
+check. Tooltips need no component: any element with `data-tip="text"` grows
+a small scrap on hover and focus. Toasts are a call:
+`Scraps.toast('glued.', { color: 'ink', duration: 4000 })`. Breadcrumbs and
+pagination compose from chips; see the swatch book.
 
 ## Attributes
 
@@ -66,6 +77,10 @@ check.
 - `data-boil`: `"false"` keeps a scrap still under the cursor
 - `data-fx`: `rip · fold · glue · shred`, a paper effect played on click; also
   callable directly as `Scraps.fx.rip(el)` etc. Skipped under reduced motion.
+- `data-tip`: tooltip text, on any element
+- `data-menu`: on a trigger, the selector of a `data-scrap="menu"` panel
+- `data-side`: (dialogs) `left | right` turns the dialog into a sheet
+- `data-active`: (tabs) which `data-tab` starts selected
 
 ## React
 
@@ -83,9 +98,13 @@ import 'scraps-ui/scraps.css'
 ```
 
 Every component renders its real HTML element and cleans up after itself on
-unmount. `ScrapInput`, `ScrapTextarea`, `ScrapSelect`, `ScrapRange`,
-`ScrapCheckbox`, `ScrapRadio`, `ScrapProgress` (with a `value` prop),
-`ScrapChip`, and `ScrapDivider` round out the set.
+unmount. The full set: `ScrapButton`, `ScrapChip`, `ScrapCard`,
+`ScrapDivider`, `ScrapInput`, `ScrapTextarea`, `ScrapSelect`, `ScrapRange`,
+`ScrapCheckbox`, `ScrapRadio`, `ScrapToggle`, `ScrapProgress`,
+`ScrapDialog` (controlled via an `open` prop), `ScrapTabs`,
+`ScrapAccordion`, `ScrapTable`, `ScrapAvatar`, `ScrapSkeleton`,
+`ScrapAlert`, `ScrapMenuPanel`, plus a `toast` export and a `tip` prop on
+everything.
 
 ## Tailwind
 

@@ -229,7 +229,7 @@
       </p>
     </div>
     <div class="book-stats" aria-hidden="true">
-      <span data-scrap="chip" data-color="kraft">9 component types</span>
+      <span data-scrap="chip" data-color="kraft">19 component types</span>
       <span data-scrap="chip" data-color="kraft">6 built-in colours</span>
       <span data-scrap="chip" data-color="kraft">2 edge styles</span>
       <span data-scrap="chip" data-color="kraft">4 paper fx</span>
@@ -345,8 +345,145 @@
     </div>
   </section>
 
+  <section id="dialog">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">10 &middot; dialog &amp; sheet</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+      <div class="row">
+        <button data-scrap="button" data-color="coral" id="openDialog" type="button">open a dialog</button>
+        <button data-scrap="button" data-color="blue" id="openSheet" type="button">open a sheet</button>
+      </div>
+      <span class="cap">real &lt;dialog&gt; elements: focus trapping, esc, and ::backdrop come from the browser. the paper re-tears on every open.</span>
+    </div>
+    <dialog data-scrap="dialog" data-tape id="demoDialog">
+      <h3>A torn sheet, taped over the mat</h3>
+      <p style="margin:0 0 18px;font-size:14.5px">native focus handling underneath. press esc, or:</p>
+      <button data-scrap="button" data-color="coral" data-close type="button">close it</button>
+    </dialog>
+    <dialog data-scrap="dialog" data-side="right" id="demoSheet">
+      <h3>A side sheet</h3>
+      <p style="margin:0 0 18px;font-size:14.5px">the same dialog element, glued to the edge.</p>
+      <button data-scrap="button" data-color="blue" data-close type="button">close</button>
+    </dialog>
+  </section>
+
+  <section id="menus">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">11 &middot; menu &amp; tooltip</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+      <div class="row">
+        <button data-scrap="button" data-color="marigold" data-menu="#demoMenu" type="button">open menu</button>
+        <span data-scrap="chip" data-color="blue" data-tip="a tiny scrap of context, re-torn on every show" tabindex="0">hover me for a tooltip</span>
+      </div>
+      <span class="cap">any element with data-tip grows a tooltip; any button with data-menu opens a paper menu.</span>
+    </div>
+    <div data-scrap="menu" id="demoMenu">
+      <button type="button">cut</button>
+      <button type="button">copy</button>
+      <button type="button">paste</button>
+      <button type="button">shred forever</button>
+    </div>
+  </section>
+
+  <section id="tabs">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">12 &middot; tabs</span></div>
+    <div data-scrap="tabs" data-seed="swatch-tabs" data-active="glue">
+      <div class="scrap-tabs-row">
+        <button data-tab="scissors" type="button">scissors</button>
+        <button data-tab="glue" type="button">glue</button>
+        <button data-tab="tape" type="button">tape</button>
+      </div>
+      <div data-panel="scissors" class="demo">left-handed pairs available on request. the active tab straightens up and turns white, like a folder tab pulled forward.</div>
+      <div data-panel="glue" class="demo">glue sticks only. rubber cement stays in the drawer.</div>
+      <div data-panel="tape" class="demo">every card on this page is one strip of tape away from falling off the mat.</div>
+    </div>
+  </section>
+
+  <section id="accordion">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">13 &middot; accordion</span></div>
+    <details data-scrap="accordion" open>
+      <summary>why native details elements?</summary>
+      <p style="margin:0;font-size:14px">keyboard and screen-reader behaviour for free, and the paper re-tears when the size changes. open and close this a few times.</p>
+    </details>
+    <div style="height:14px"></div>
+    <details data-scrap="accordion">
+      <summary>does the paper notice?</summary>
+      <p style="margin:0;font-size:14px">the ResizeObserver repaints the tear on every toggle, so yes: opening an accordion is also tearing paper.</p>
+    </details>
+  </section>
+
+  <section id="table">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">14 &middot; table</span></div>
+    <table data-scrap="table">
+      <thead>
+        <tr><th>stock</th><th>weight</th><th>tears</th><th>verdict</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>construction</td><td>86 gsm</td><td>beautifully</td><td>the default</td></tr>
+        <tr><td>kraft</td><td>120 gsm</td><td>stubbornly</td><td>for parcels</td></tr>
+        <tr><td>newsprint</td><td>45 gsm</td><td>too easily</td><td>stolen anyway</td></tr>
+        <tr><td>cardstock</td><td>250 gsm</td><td>barely</td><td>fancy</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="media">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">15 &middot; avatar &amp; skeleton</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+      <h3>Torn photos</h3>
+      <div class="row">
+        <span><img data-scrap="avatar" src="favicon.svg" width="64" height="64" alt="a scrap of coral paper"></span>
+        <span><img data-scrap="avatar" data-edge="cut" src="favicon.svg" width="64" height="64" alt="a scrap of coral paper, cut edges"></span>
+        <span><img data-scrap="avatar" data-amp="5" src="favicon.svg" width="96" height="96" alt="a scrap of coral paper, rougher tear"></span>
+      </div>
+      <h3>Loading paper</h3>
+      <div style="max-width:340px">
+        <div data-scrap="skeleton" style="width:70%"></div>
+        <div style="height:10px"></div>
+        <div data-scrap="skeleton"></div>
+        <div style="height:10px"></div>
+        <div data-scrap="skeleton" style="width:45%"></div>
+      </div>
+      <span class="cap">skeletons keep slowly re-tearing while they wait. reduced motion turns that off.</span>
+    </div>
+  </section>
+
+  <section id="feedback">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">16 &middot; toast &amp; alert</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+      <div class="row">
+        <button data-scrap="button" data-color="coral" id="toastBtn" type="button">glue a toast</button>
+        <button data-scrap="button" data-color="ink" id="toastBtn2" type="button">a dark one</button>
+      </div>
+      <span class="cap">toasts glue themselves to the corner, then peel away. click one to dismiss it early.</span>
+    </div>
+    <div style="height:22px"></div>
+    <div data-scrap="alert">
+      <b>mind the edges.</b> alerts are kraft paper with tape and a role, nothing more.
+    </div>
+  </section>
+
+  <section id="patterns">
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">17 &middot; patterns</span></div>
+    <div class="demo" data-scrap="card" data-color="white">
+      <h3>Breadcrumb: chips and a pencil slash</h3>
+      <div class="row" style="gap:8px">
+        <a data-scrap="chip" data-color="kraft" href="#">drawer</a><span style="color:#6B5F4C">/</span>
+        <a data-scrap="chip" data-color="kraft" href="#">paper</a><span style="color:#6B5F4C">/</span>
+        <span data-scrap="chip" data-color="white">construction</span>
+      </div>
+      <h3>Pagination: the current page is the white scrap</h3>
+      <div class="row" style="gap:8px">
+        <a data-scrap="chip" data-color="kraft" href="#">&larr;</a>
+        <a data-scrap="chip" data-color="kraft" href="#">1</a>
+        <span data-scrap="chip" data-color="white">2</span>
+        <a data-scrap="chip" data-color="kraft" href="#">3</a>
+        <a data-scrap="chip" data-color="kraft" href="#">&rarr;</a>
+      </div>
+      <span class="cap">no components needed: chips compose into breadcrumbs and pagination on their own.</span>
+    </div>
+  </section>
+
   <section id="colours">
-    <div class="sec-head"><span data-scrap="chip" data-color="kraft">09 · custom colours</span></div>
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">18 · custom colours</span></div>
     <div class="demo" data-scrap="card" data-color="white">
 <pre class="snippet"><code>Scraps.registerColors({
   rose:  '#C4587A',
@@ -373,7 +510,7 @@
   </section>
 
   <section id="api">
-    <div class="sec-head"><span data-scrap="chip" data-color="kraft">10 · the whole api</span></div>
+    <div class="sec-head"><span data-scrap="chip" data-color="kraft">19 · the whole api</span></div>
     <div class="api-grid" id="api-grid"></div>
   </section>
 
@@ -495,6 +632,7 @@
     ['Scraps.reseed(seed)', 're-tears the whole page; the same seed is pixel-identical anywhere.'],
     ['Scraps.setProgress(el, pct)', 'moves a progress strip.'],
     ['Scraps.registerColors(map)', 'mints new paper colours at runtime.'],
+    ['Scraps.toast(msg, opts)', 'glues a paper toast into the corner; returns close().'],
     ['Scraps.fx.rip / fold / glue / shred', 'paper gestures, also wired by data-fx.'],
     ['Scraps.boil', 'global switch for hover re-tearing.'],
   ]
@@ -527,6 +665,26 @@
   amp.addEventListener('input', rebuild)
   rot.addEventListener('input', rebuild)
   rebuild()
+
+  // dialog, sheet, toasts
+  document.getElementById('openDialog').addEventListener('click', () => {
+    const d = document.getElementById('demoDialog')
+    Scraps.tear(d)
+    d.showModal()
+  })
+  document.getElementById('openSheet').addEventListener('click', () => {
+    const d = document.getElementById('demoSheet')
+    Scraps.tear(d)
+    d.showModal()
+  })
+  const TOASTS = ['glued.', 'stuck the landing.', 'that one is taped for good.', 'fresh from the pad.']
+  let ti = 0
+  document.getElementById('toastBtn').addEventListener('click', () => {
+    Scraps.toast(TOASTS[ti++ % TOASTS.length])
+  })
+  document.getElementById('toastBtn2').addEventListener('click', () => {
+    Scraps.toast('dark stock, same glue.', { color: 'ink' })
+  })
 </script>
 </body>
 </html>

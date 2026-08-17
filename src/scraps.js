@@ -119,6 +119,8 @@
     field:    { edge: 'cut',  amp: 2.4, rot: 0.5, boil: false },
     divider:  { edge: 'torn', amp: 3.4, rot: 0.4, boil: false },
     progress: { edge: 'torn', amp: 2.6, rot: 0.4, boil: false },
+    avatar:   { edge: 'torn', amp: 2.6, rot: 2.0, boil: false },
+    skeleton: { edge: 'torn', amp: 2.4, rot: 0.5, boil: false },
     box:      { edge: 'cut',  amp: 2.0, rot: 0,   boil: false },
     tape:     { edge: 'cut',  amp: 2.0, rot: 0,   boil: false },
   }
@@ -255,6 +257,14 @@
     rec.pFringe.setAttribute('d', dFringe)
     rec.pFace.setAttribute('d', dFace)
     rec.pGrain.setAttribute('d', dFace)
+    if (rec.type === 'avatar') {
+      const img = el.querySelector('img')
+      if (img) {
+        const rD = rng(...base, 'clip')
+        const pts = rectPts(w, h, rD, rec.edge, rec.amp * 0.9, -1.2)
+        img.style.clipPath = 'polygon(' + pts.map(pt => pt[0].toFixed(1) + 'px ' + pt[1].toFixed(1) + 'px').join(',') + ')'
+      }
+    }
     if (rec.rot) el.style.setProperty('--scrap-rot', ((rC() * 2 - 1) * rec.rot).toFixed(2) + 'deg')
   }
 
@@ -497,6 +507,277 @@
   }
 
   const FX = { rip: fxRip, fold: fxFold, glue: fxGlue, shred: fxShred }
+
+
+  /* ---------------- overlays: dialog, menu, tooltip, toast ---------------- */
+
+  function buildDialog (el) {
+    const rec = attach(el, 'card', { rot: 0.5 })
+    el.classList.add('scrap-dialog')
+    if (el.dataset.tape != null) addTape(el, rec)
+    // any [data-close] inside closes the dialog
+    el.addEventListener('click', e => {
+      const c = e.target.closest && e.target.closest('[data-close]')
+      if (c && el.contains(c) && el.close) el.close()
+    }, sig(rec))
+  }
+
+  // a generic paper menu: any <button data-menu="#panel"> toggles it
+  function buildMenu (el) {
+    const rec = attach(el, 'card', { rot: 0.6 })
+    el.classList.add('scrap-menu-panel')
+    el.setAttribute('role', 'menu')
+    el.querySelectorAll(':scope > button, :scope > a').forEach(b => {
+      b.classList.add('scrap-option')
+      b.setAttribute('role', 'menuitem')
+    })
+    attachRowHighlight(el, rec)
+  }
+
+  // the cut-paper highlight that tracks .scrap-option rows under the cursor
+  function attachRowHighlight (panel, ownerRec) {
+    const hl = document.createElement('span')
+    hl.className = 'scrap-option-hl'
+    hl.style.opacity = '0'
+    panel.appendChild(hl)
+    const hlRec = attach(hl, 'box', { edge: 'cut', amp: 2.2, rot: 1.1, color: 'marigold', id: ownerRec.id + '-hl' })
+    panel.addEventListener('mouseover', e => {
+      const row = e.target.closest && e.target.closest('.scrap-option')
+      if (!row || !panel.contains(row)) { hl.style.opacity = '0'; return }
+      hl.style.opacity = '1'
+      hl.style.top = row.offsetTop + 'px'
+      hl.style.left = row.offsetLeft + 'px'
+      hl.style.width = row.offsetWidth + 'px'
+      hl.style.height = row.offsetHeight + 'px'
+      hlRec.n++
+      paint(hlRec)
+    }, sig(ownerRec))
+    panel.addEventListener('mouseleave', () => { hl.style.opacity = '0' }, sig(ownerRec))
+  }
+
+  function wireMenus () {
+    if (wireMenus.done) return
+    wireMenus.done = true
+    const openPanel = () => document.querySelector('.scrap-menu-panel.is-open')
+    document.addEventListener('click', e => {
+      const t = e.target.closest && e.target.closest('[data-menu]')
+      const open = openPanel()
+      if (t) {
+        const panel = document.querySelector(t.dataset.menu)
+        if (!panel) return
+        if (open && open !== panel) open.classList.remove('is-open')
+        if (panel.classList.contains('is-open')) {
+          panel.classList.remove('is-open')
+          t.setAttribute('aria-expanded', 'false')
+          return
+        }
+        panel.classList.add('is-open')
+        const rec = panel.__scrapRec
+        if (rec) { rec.n++; paint(rec) }
+        const r = t.getBoundingClientRect()
+        const pr = panel.getBoundingClientRect()
+        let top = r.bottom + 10
+        if (top + pr.height > innerHeight - 8) top = Math.max(8, r.top - pr.height - 10)
+        panel.style.top = top + 'px'
+        panel.style.left = Math.max(8, Math.min(r.left, innerWidth - pr.width - 8)) + 'px'
+        t.setAttribute('aria-expanded', 'true')
+      } else if (open && (e.target.closest('.scrap-option') || !e.target.closest('.scrap-menu-panel'))) {
+        open.classList.remove('is-open')
+      }
+    })
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        const open = openPanel()
+        if (open) open.classList.remove('is-open')
+      }
+    })
+  }
+
+  // tooltips: one shared scrap serves every [data-tip] element
+  let tipEl = null
+  let tipRec = null
+  let tipTarget = null
+  function showTip (target) {
+    if (!tipEl) {
+      tipEl = document.createElement('span')
+      tipEl.setAttribute('role', 'tooltip')
+      document.body.appendChild(tipEl)
+      tipRec = attach(tipEl, 'chip', { color: 'kraft', rot: 2, boil: false })
+      tipEl.classList.add('scrap-tip')
+    }
+    tipTarget = target
+    tipEl.textContent = target.dataset.tip
+    tipRec.n++
+    paint(tipRec)
+    tipEl.classList.add('is-on')
+    const r = target.getBoundingClientRect()
+    const tr = tipEl.getBoundingClientRect()
+    let top = r.top - tr.height - 10
+    if (top < 8) top = r.bottom + 10
+    tipEl.style.top = top + 'px'
+    tipEl.style.left = Math.max(8, Math.min(r.left + r.width / 2 - tr.width / 2, innerWidth - tr.width - 8)) + 'px'
+  }
+  function hideTip () {
+    if (tipEl) tipEl.classList.remove('is-on')
+    tipTarget = null
+  }
+  function wireTips () {
+    if (wireTips.done) return
+    wireTips.done = true
+    document.addEventListener('mouseover', e => {
+      const t = e.target.closest && e.target.closest('[data-tip]')
+      if (t) showTip(t)
+      else if (tipTarget) hideTip()
+    })
+    document.addEventListener('focusin', e => {
+      const t = e.target.closest && e.target.closest('[data-tip]')
+      if (t) showTip(t)
+    })
+    document.addEventListener('focusout', hideTip)
+    addEventListener('scroll', hideTip, true)
+  }
+
+  let toastBox = null
+  // Scraps.toast('saved', { color: 'kraft', duration: 4000 }) -> close()
+  function toast (msg, o = {}) {
+    if (!toastBox) {
+      toastBox = document.createElement('div')
+      toastBox.className = 'scrap-toasts'
+      toastBox.setAttribute('aria-live', 'polite')
+      document.body.appendChild(toastBox)
+    }
+    const t = document.createElement('div')
+    t.className = 'scrap-toast'
+    t.textContent = String(msg)
+    toastBox.appendChild(t)
+    const rec = attach(t, 'card', { color: o.color || 'white', rot: 2 })
+    addTape(t, rec)
+    if (!state.reduced) {
+      t.animate(
+        [{ transform: 'translateY(14px) rotate(2deg)', opacity: 0 }, { transform: 'none', opacity: 1 }],
+        { duration: 240, easing: 'ease-out' }
+      )
+    }
+    let closed = false
+    const close = () => {
+      if (closed) return
+      closed = true
+      const done = () => { release(t); t.remove() }
+      if (state.reduced) return done()
+      t.animate(
+        [{ transform: 'none', opacity: 1 }, { transform: 'translateY(-10px) rotate(-6deg)', opacity: 0 }],
+        { duration: 300, easing: 'ease-in' }
+      )
+      setTimeout(done, 320)
+    }
+    if (o.duration !== 0) setTimeout(close, o.duration || 4000)
+    t.addEventListener('click', close, sig(rec))
+    return close
+  }
+
+  /* ---------------- disclosure and data: tabs, accordion, table ----------- */
+
+  function buildTabs (el) {
+    el.classList.add('scrap-tabs')
+    const base = el.dataset.seed || ('tabs' + state.uid++)
+    const tabs = [...el.querySelectorAll('[data-tab]')]
+    const panels = [...el.querySelectorAll('[data-panel]')]
+    const row = el.querySelector(':scope > .scrap-tabs-row')
+    if (row) row.setAttribute('role', 'tablist')
+    tabs.forEach((b, i) => {
+      b.classList.add('scrap-tab')
+      b.setAttribute('role', 'tab')
+      attach(b, 'chip', { color: 'kraft', rot: 1.5, id: base + '-t' + i })
+    })
+    panels.forEach((pn, i) => {
+      pn.setAttribute('role', 'tabpanel')
+      attach(pn, 'card', { id: base + '-p' + i })
+    })
+    const activate = i => {
+      tabs.forEach((b, k) => {
+        b.classList.toggle('is-active', k === i)
+        b.setAttribute('aria-selected', String(k === i))
+      })
+      panels.forEach((pn, k) => { pn.hidden = k !== i })
+      const rec = tabs[i] && tabs[i].__scrapRec
+      if (rec) { rec.n++; paint(rec) }
+    }
+    tabs.forEach((b, i) => b.addEventListener('click', () => activate(i), sig(b.__scrapRec)))
+    activate(Math.max(0, tabs.findIndex(b => b.dataset.tab === el.dataset.active)))
+  }
+
+  function buildAccordion (el) {
+    // closed <details> hides every non-summary child, the svg included,
+    // so the paper lives on a wrapper
+    let wrap = el.parentElement && el.parentElement.classList.contains('scrap-accordion')
+      ? el.parentElement
+      : null
+    if (!wrap) {
+      wrap = document.createElement('div')
+      wrap.className = 'scrap-accordion'
+      el.parentNode.insertBefore(wrap, el)
+      wrap.appendChild(el)
+    }
+    for (const k of ['color', 'edge', 'seed', 'amp', 'rot']) {
+      if (el.dataset[k] != null) wrap.dataset[k] = el.dataset[k]
+    }
+    attach(wrap, 'card', { rot: 0.5 })
+    wrap.classList.add('scrap-accordion')
+  }
+
+  function buildTable (el) {
+    let wrap = el.parentElement && el.parentElement.classList.contains('scrap-table-wrap')
+      ? el.parentElement
+      : null
+    if (!wrap) {
+      wrap = document.createElement('div')
+      wrap.className = 'scrap-table-wrap'
+      el.parentNode.insertBefore(wrap, el)
+      wrap.appendChild(el)
+    }
+    for (const k of ['color', 'edge', 'seed', 'amp', 'rot']) {
+      if (el.dataset[k] != null) wrap.dataset[k] = el.dataset[k]
+    }
+    attach(wrap, 'card', { rot: 0.5 })
+    wrap.classList.add('scrap-table-wrap')
+  }
+
+  function buildAvatar (el) {
+    let wrap = el.parentElement && el.parentElement.classList.contains('scrap-avatar-wrap')
+      ? el.parentElement
+      : null
+    if (!wrap) {
+      wrap = document.createElement('span')
+      wrap.className = 'scrap-avatar-wrap'
+      el.parentNode.insertBefore(wrap, el)
+      wrap.appendChild(el)
+    }
+    for (const k of ['color', 'edge', 'seed', 'amp', 'rot']) {
+      if (el.dataset[k] != null) wrap.dataset[k] = el.dataset[k]
+    }
+    attach(wrap, 'avatar', {})
+    wrap.classList.add('scrap-avatar-wrap')
+  }
+
+  function buildSkeleton (el) {
+    const rec = attach(el, 'skeleton', { color: el.dataset.color || 'kraft' })
+    if (!state.reduced) {
+      // loading paper never settles: a slow permanent boil
+      const iv = setInterval(() => {
+        if (!el.isConnected) return clearInterval(iv)
+        rec.n++
+        paint(rec)
+      }, 1100)
+      if (rec.ac) rec.ac.signal.addEventListener('abort', () => clearInterval(iv))
+    }
+  }
+
+  function buildAlert (el) {
+    const rec = attach(el, 'card', { color: el.dataset.color || 'kraft', rot: 0.8 })
+    el.classList.add('scrap-alert')
+    if (!el.getAttribute('role')) el.setAttribute('role', 'alert')
+    addTape(el, rec)
+  }
 
   /* ---------------- builders ---------------- */
 
@@ -751,6 +1032,14 @@
     radio: el => buildChoice(el, 'radio'),
     toggle: el => buildChoice(el, 'toggle'),
     progress: buildProgress,
+    dialog: buildDialog,
+    menu: buildMenu,
+    tabs: buildTabs,
+    accordion: buildAccordion,
+    table: buildTable,
+    avatar: buildAvatar,
+    skeleton: buildSkeleton,
+    alert: buildAlert,
   }
 
   function enhance (el) {
@@ -792,6 +1081,8 @@
 
   function init (root = document) {
     ensureDefs()
+    wireTips()
+    wireMenus()
     root.querySelectorAll('[data-scrap]').forEach(enhance)
   }
 
@@ -814,6 +1105,7 @@
     reseed,
     setProgress,
     registerColors,
+    toast,
     fx: FX,
     get seed () { return state.seed },
     get boil () { return state.boil },

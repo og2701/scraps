@@ -9,6 +9,8 @@ export interface ScrapStyleProps {
   amp?: number
   boil?: boolean
   fx?: 'rip' | 'fold' | 'glue' | 'shred'
+  /** tooltip text, shown on hover and focus as a small scrap */
+  tip?: string
 }
 
 type ScrapComponent<T, E> = React.ForwardRefExoticComponent<
@@ -28,6 +30,16 @@ export const ScrapTextarea: ScrapComponent<React.ComponentPropsWithoutRef<'texta
 export const ScrapSelect: ScrapComponent<React.ComponentPropsWithoutRef<'select'> & { wrapClassName?: string; wrapStyle?: React.CSSProperties }, HTMLSelectElement>
 export const ScrapRange: ScrapComponent<React.ComponentPropsWithoutRef<'input'> & { wrapClassName?: string; wrapStyle?: React.CSSProperties }, HTMLInputElement>
 
+export const ScrapAlert: ScrapComponent<React.ComponentPropsWithoutRef<'div'>, HTMLDivElement>
+export const ScrapSkeleton: ScrapComponent<React.ComponentPropsWithoutRef<'div'>, HTMLDivElement>
+export const ScrapAccordion: ScrapComponent<React.ComponentPropsWithoutRef<'details'> & { summary?: React.ReactNode }, HTMLDetailsElement>
+export const ScrapDialog: ScrapComponent<React.ComponentPropsWithoutRef<'dialog'> & { open?: boolean; side?: 'left' | 'right'; tape?: boolean }, HTMLDialogElement>
+export const ScrapTabs: ScrapComponent<React.ComponentPropsWithoutRef<'div'> & { active?: string }, HTMLDivElement>
+export const ScrapTable: ScrapComponent<React.ComponentPropsWithoutRef<'table'> & { wrapClassName?: string; wrapStyle?: React.CSSProperties }, HTMLTableElement>
+export const ScrapAvatar: ScrapComponent<React.ComponentPropsWithoutRef<'img'> & { wrapClassName?: string; wrapStyle?: React.CSSProperties }, HTMLImageElement>
+export const ScrapMenuPanel: ScrapComponent<React.ComponentPropsWithoutRef<'div'>, HTMLDivElement>
+
+export const toast: ScrapsApi['toast']
 export const init: ScrapsApi['init']
 export const reseed: ScrapsApi['reseed']
 export const tear: ScrapsApi['tear']

@@ -25,6 +25,8 @@ export interface ScrapStyleProps {
   boil?: boolean
   /** paper gesture played on click */
   fx?: 'rip' | 'fold' | 'glue' | 'shred'
+  /** tooltip text shown on hover and focus */
+  tip?: string
 }
 
 export function scrapData (p: ScrapStyleProps) {
@@ -36,6 +38,7 @@ export function scrapData (p: ScrapStyleProps) {
     'data-amp': p.amp,
     'data-boil': p.boil == null ? undefined : String(p.boil),
     'data-fx': p.fx,
+    'data-tip': p.tip,
   }
 }
 
@@ -46,7 +49,9 @@ export function useScrap<T extends HTMLElement> () {
     if (!el) return
     Scraps.enhance(el)
     return () => {
-      Scraps.release((el.closest('.scrap-field-wrap') as HTMLElement) ?? el)
+      Scraps.release(
+        (el.closest('.scrap-field-wrap, .scrap-table-wrap, .scrap-avatar-wrap, .scrap-accordion') as HTMLElement) ?? el
+      )
     }
   }, [])
   return ref

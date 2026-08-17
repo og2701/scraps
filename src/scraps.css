@@ -387,11 +387,238 @@
   filter: drop-shadow(1px 1.5px 1px var(--sc-shadow));
 }
 
+/* ---------------- dialog & sheet ---------------- */
+
+/* the .scrap display would defeat the UA's closed-dialog hiding */
+dialog.scrap-dialog:not([open]) { display: none; }
+
+dialog.scrap-dialog {
+  border: 0;
+  background: transparent;
+  padding: 24px 28px;
+  overflow: visible;
+  max-width: min(30em, calc(100vw - 80px));
+}
+
+dialog.scrap-dialog::backdrop {
+  background: rgba(16, 28, 22, 0.55);
+}
+
+dialog.scrap-dialog[data-side] {
+  margin: 0;
+  height: 100vh;
+  max-height: 100vh;
+  max-width: min(24em, 84vw);
+}
+
+dialog.scrap-dialog[data-side='right'] { margin-left: auto; }
+dialog.scrap-dialog[data-side='left'] { margin-right: auto; }
+
+/* ---------------- menu panel ---------------- */
+
+.scrap-menu-panel {
+  position: fixed;
+  z-index: 80;
+  display: none;
+  padding: 9px;
+  min-width: 160px;
+}
+
+.scrap-menu-panel.is-open { display: block; }
+
+.scrap-menu-panel > .scrap-option {
+  display: flex;
+  width: 100%;
+  background: none;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 11px;
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---------------- tooltip ---------------- */
+
+.scrap-tip {
+  position: fixed;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease-out;
+  font-size: 13px;
+  max-width: 260px;
+}
+
+.scrap-tip.is-on { opacity: 1; }
+
+/* ---------------- toasts ---------------- */
+
+.scrap-toasts {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  pointer-events: none;
+}
+
+.scrap-toast {
+  pointer-events: auto;
+  padding: 13px 20px;
+  max-width: 320px;
+  cursor: pointer;
+  font-size: 14.5px;
+}
+
+/* ---------------- tabs ---------------- */
+
+.scrap-tabs { display: block; }
+
+.scrap-tabs-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 14px;
+  position: relative;
+  z-index: 2;
+  margin-bottom: -4px;
+}
+
+.scrap-tab {
+  background: none;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.9em;
+  padding: 0.45em 1em;
+  cursor: pointer;
+}
+
+.scrap-tab.is-active {
+  transform: rotate(0deg);
+  z-index: 3;
+}
+
+.scrap-tab.is-active > .scrap-svg .scrap-face { fill: var(--sc-white); }
+.scrap-tab.is-active { color: var(--sc-text); }
+
+.scrap-tabs [data-panel] { padding: 22px 24px; }
+.scrap[hidden] { display: none; }
+
+/* ---------------- accordion ---------------- */
+
+.scrap-accordion {
+  display: block;
+  padding: 16px 20px;
+}
+
+.scrap-accordion summary {
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+  position: relative;
+  padding-right: 28px;
+}
+
+.scrap-accordion summary::-webkit-details-marker { display: none; }
+
+.scrap-accordion summary::after {
+  content: '';
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  width: 12px;
+  height: 9px;
+  margin-top: -4px;
+  background: currentColor;
+  clip-path: polygon(4% 14%, 96% 2%, 54% 98%);
+  transform: rotate(-90deg);
+  transition: transform 0.15s ease-out;
+}
+
+.scrap-accordion details[open] summary::after { transform: rotate(-3deg); }
+
+.scrap-accordion details > :not(summary) { margin-top: 12px; }
+
+/* ---------------- table: ruled paper ---------------- */
+
+.scrap-table-wrap {
+  display: block;
+  padding: 20px 22px;
+  overflow-x: auto;
+}
+
+.scrap-table-wrap table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
+
+.scrap-table-wrap th {
+  text-align: left;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 6px 10px 9px;
+  border-bottom: 2px solid rgba(42, 36, 28, 0.4);
+}
+
+.scrap-table-wrap td {
+  padding: 9px 10px;
+  border-bottom: 1px dashed rgba(42, 36, 28, 0.25);
+}
+
+.scrap-table-wrap tr:last-child td { border-bottom: 0; }
+
+.scrap--ink.scrap-table-wrap th { border-bottom-color: rgba(246, 241, 228, 0.5); }
+.scrap--ink.scrap-table-wrap td { border-bottom-color: rgba(246, 241, 228, 0.3); }
+
+/* ---------------- avatar: a torn photo ---------------- */
+
+.scrap-avatar-wrap {
+  display: inline-block;
+}
+
+.scrap-avatar-wrap img {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------------- skeleton ---------------- */
+
+.scrap-skeleton {
+  display: block;
+  height: 16px;
+  animation: scrap-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes scrap-pulse {
+  50% { opacity: 0.55; }
+}
+
+/* ---------------- alert ---------------- */
+
+.scrap-alert {
+  display: block;
+  padding: 16px 20px;
+}
+
 /* ---------------- motion ---------------- */
 
 @media (prefers-reduced-motion: reduce) {
   .scrap-choice .scrap-mark,
-  .scrap-toggle .scrap-boxslot > .scrap-mark {
+  .scrap-toggle .scrap-boxslot > .scrap-mark,
+  .scrap-tip {
     transition: none;
   }
+
+  .scrap-skeleton { animation: none; }
 }
