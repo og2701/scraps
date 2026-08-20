@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scraps · adapter</title>
+<meta name="description" content="Paper a design system scraps knows nothing about">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="../src/scraps.css">
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Courier Prime', 'Courier New', monospace;
+    font-size: 16px;
+    line-height: 1.55;
+    color: #E8E3D2;
+    background:
+      radial-gradient(1100px 700px at 50% -10%, rgba(255, 255, 255, 0.055), transparent 60%),
+      repeating-linear-gradient(0deg, transparent 0 47px, rgba(225, 240, 228, 0.075) 47px 48px),
+      repeating-linear-gradient(90deg, transparent 0 47px, rgba(225, 240, 228, 0.075) 47px 48px),
+      #33534A;
+    min-height: 100vh;
+  }
+
+  main { max-width: 900px; margin: 0 auto; padding: 64px 24px 120px; }
+  h1 { font-family: 'Archivo Black', system-ui, sans-serif; font-size: 44px; margin: 0 0 12px; }
+  .lede { max-width: 62ch; opacity: 0.86; margin: 0 0 8px; }
+  h2 { font-family: 'Archivo Black', system-ui, sans-serif; font-size: 20px; margin: 56px 0 14px; }
+  code { background: rgba(0, 0, 0, 0.28); padding: 1px 5px; border-radius: 3px; }
+  pre {
+    background: rgba(0, 0, 0, 0.3);
+    border-left: 3px solid rgba(239, 166, 46, 0.7);
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .bar { display: flex; align-items: center; gap: 14px; margin: 26px 0 8px; }
+  .bar button {
+    font: inherit;
+    font-size: 14px;
+    color: #26211A;
+    background: #EFA62E;
+    border: 0;
+    padding: 9px 16px;
+    cursor: pointer;
+  }
+  .note { font-size: 14px; opacity: 0.7; }
+
+  /* ------------------------------------------------------------------
+     below is "someone else's design system": plain markup with data-slot
+     attributes and boring css. scraps never sees a data-scrap attribute.
+     ------------------------------------------------------------------ */
+
+  .app {
+    font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color: #1B2430;
+    background: #F1F3F6;
+    padding: 30px;
+    border-radius: 14px;
+  }
+
+  .app [data-slot="card"] {
+    background: #FFFFFF;
+    border: 1px solid #DDE2EA;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+    padding: 22px 24px;
+    margin-bottom: 22px;
+  }
+
+  .app h3 { margin: 0 0 4px; font-size: 17px; }
+  .app p { margin: 0 0 18px; font-size: 14px; color: #55617A; }
+
+  .app [data-slot="button"] {
+    font: inherit;
+    font-size: 14px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1px solid #2F5DE0;
+    background: #2F5DE0;
+    color: #FFFFFF;
+    cursor: pointer;
+  }
+
+  .app [data-slot="button"][data-variant="secondary"] {
+    background: #FFFFFF;
+    border-color: #C9D2E2;
+    color: #1B2430;
+  }
+
+  .app [data-slot="button"][data-disabled] { opacity: 0.55; cursor: not-allowed; }
+
+  .app [data-slot="badge"] {
+    display: inline-block;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #ECF0F8;
+    border: 1px solid #D6DEEC;
+    color: #37456A;
+  }
+
+  .app [data-slot="input"] {
+    font: inherit;
+    font-size: 14px;
+    padding: 9px 12px;
+    border: 1px solid #C9D2E2;
+    border-radius: 8px;
+    background: #FFFFFF;
+    width: 240px;
+  }
+
+  .app [data-slot="separator"] {
+    height: 1px;
+    background: #DDE2EA;
+    border: 0;
+    margin: 20px 0;
+  }
+
+  .app .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  .app [data-slot="dialog"] {
+    position: fixed;
+    left: 50%;
+    top: 34%;
+    transform: translateX(-50%);
+    width: min(420px, calc(100vw - 40px));
+    background: #FFFFFF;
+    border: 1px solid #DDE2EA;
+    border-radius: 12px;
+    box-shadow: 0 18px 48px rgba(16, 24, 40, 0.24);
+    padding: 24px;
+    z-index: 20;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>adapter</h1>
+  <p class="lede">
+    The panel below is someone else's design system: plain markup with
+    <code>data-slot</code> attributes and flat, rounded, corporate CSS. There is
+    not one <code>data-scrap</code> attribute in it and not one scraps component.
+  </p>
+  <p class="lede">
+    One call papers the whole thing, and the disposer hands it back untouched.
+  </p>
+
+<pre>const stop = Scraps.adapt({
+  '[data-slot="card"]': 'card',
+  '[data-slot="button"]': 'button',
+  '[data-slot="button"][data-variant="secondary"]': { type: 'button', color: 'white' },
+  '[data-slot="button"][data-disabled]': { type: 'button', color: 'kraft', boil: false },
+  '[data-slot="badge"]': { type: 'badge', color: 'marigold' },
+  '[data-slot="input"]': 'input',
+  '[data-slot="separator"]': 'separator',
+  '[data-slot="dialog"]': 'dialog',
+})
+
+stop()   // every element back to plain markup</pre>
+
+  <div class="bar">
+    <button id="toggle" type="button">paper: off</button>
+    <span class="note">same DOM either way</span>
+  </div>
+
+  <div class="app">
+    <div data-slot="card">
+      <h3>Billing <span data-slot="badge">beta</span></h3>
+      <p>Usage is metered hourly and invoiced at the end of the cycle.</p>
+      <div class="row">
+        <input data-slot="input" type="text" value="pro plan" aria-label="plan">
+        <button data-slot="button" type="button">Save changes</button>
+        <button data-slot="button" data-variant="secondary" type="button">Cancel</button>
+        <button data-slot="button" data-disabled type="button">Locked</button>
+      </div>
+      <div data-slot="separator"></div>
+      <div class="row">
+        <button data-slot="button" data-variant="secondary" id="open" type="button">Open a portalled dialog</button>
+        <span class="note" style="color: #55617A">mounts after the adapter started</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>what the state selectors do</h2>
+  <p class="lede">
+    Entries are read in order and the last match wins, so
+    <code>[data-slot="button"][data-disabled]</code> overrides the plain button
+    rule above it. The observer watches only the attributes those selectors
+    name, so a component flipping <code>data-disabled</code> or
+    <code>data-open</code> at runtime re-cuts its paper on the spot.
+  </p>
+</main>
+
+<div id="portal"></div>
+
+<script src="../src/scraps.js"></script>
+<script>
+  const MAP = {
+    '[data-slot="card"]': 'card',
+    '[data-slot="button"]': 'button',
+    '[data-slot="button"][data-variant="secondary"]': { type: 'button', color: 'white' },
+    '[data-slot="button"][data-disabled]': { type: 'button', color: 'kraft', boil: false },
+    '[data-slot="badge"]': { type: 'badge', color: 'marigold' },
+    '[data-slot="input"]': 'input',
+    '[data-slot="separator"]': 'separator',
+    '[data-slot="dialog"]': 'dialog',
+  }
+
+  let stop = null
+  const toggle = document.getElementById('toggle')
+  toggle.addEventListener('click', () => {
+    if (stop) { stop(); stop = null } else { stop = Scraps.adapt(MAP) }
+    toggle.textContent = 'paper: ' + (stop ? 'on' : 'off')
+  })
+
+  // a dialog that mounts long after the adapter did, the portal case
+  document.getElementById('open').addEventListener('click', () => {
+    const portal = document.getElementById('portal')
+    if (portal.firstChild) return portal.replaceChildren()
+    const dlg = document.createElement('div')
+    dlg.className = 'app'
+    dlg.style.all = 'unset'
+    dlg.innerHTML =
+      '<div data-slot="dialog" style="font-family: ui-sans-serif, system-ui, sans-serif; color: #1B2430">' +
+      '<h3 style="margin: 0 0 6px; font-size: 17px">Cancel the plan?</h3>' +
+      '<p style="margin: 0 0 18px; font-size: 14px; color: #55617A">Access ends at the close of the cycle.</p>' +
+      '<div style="display: flex; gap: 10px">' +
+      '<button data-slot="button" type="button">Confirm</button>' +
+      '<button data-slot="button" data-variant="secondary" data-close type="button">Keep it</button>' +
+      '</div></div>'
+    portal.appendChild(dlg)
+    dlg.querySelector('[data-close]').addEventListener('click', () => portal.replaceChildren())
+  })
+</script>
+</body>
+</html>

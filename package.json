@@ -8,6 +8,8 @@
     "src"
   ],
   "keywords": [
+    "adapter",
+    "base-ui",
     "collage",
     "paper",
     "react",

@@ -19,8 +19,23 @@ export const reseed = Scraps.reseed
 export const tear = Scraps.tear
 export const setProgress = Scraps.setProgress
 export const registerColors = Scraps.registerColors
+export const skin = Scraps.skin
+export const adapt = Scraps.adapt
+export const unadapt = Scraps.unadapt
 export const toast = Scraps.toast
 export const fx = Scraps.fx
+
+/**
+ * papers a host design system for as long as the component is mounted.
+ * define the map outside the component so it stays referentially stable.
+ */
+export function useScraps (map, options = {}) {
+  const { enabled = true, root } = options
+  useLayoutEffect(() => {
+    if (!enabled || !map) return
+    return Scraps.adapt(map, { root })
+  }, [map, enabled, root])
+}
 
 function useEnhance () {
   const ref = useRef(null)

@@ -106,6 +106,66 @@ unmount. The full set: `ScrapButton`, `ScrapChip`, `ScrapCard`,
 `ScrapAlert`, `ScrapMenuPanel`, plus a `toast` export and a `tip` prop on
 everything.
 
+## Any design system
+
+`Scraps.adapt` papers components scraps knows nothing about: Base UI, Radix,
+shadcn, your own. You hand it a map from selector to paper and it does the
+rest, so no host component has to be edited or wrapped.
+
+```js
+const stop = Scraps.adapt({
+  '[data-slot="card"]': 'card',
+  '[data-slot="button"]': 'button',
+  '[data-slot="button"][data-disabled]': { type: 'button', color: 'kraft', boil: false },
+  '[data-slot="badge"]': { type: 'badge', color: 'marigold' },
+  '[data-slot="input"]': 'input',
+  '[data-slot="dialog-content"]': 'dialog',
+})
+
+stop()   // every element handed back as plain markup
+```
+
+One observer watches the document, so paper reaches a dialog or a popover the
+moment it is portalled in, and comes off when it unmounts. Entries are read in
+order and the last match wins, so a state selector can override a plain one;
+only the attributes those selectors name are watched, so a component flipping
+`data-disabled` or `data-open` re-cuts its paper on the spot and nothing else
+costs anything.
+
+The paper is `attach()` and nothing else. No wrapper nodes, no adopted
+children, no behavior: the host keeps its own markup, keyboard handling and
+accessibility, and scraps only supplies the tear. Elements that take no
+children, `<input>` and `<textarea>`, get the tear cut out of the element
+itself as a `clip-path` instead of laid behind it, and keep their own
+background.
+
+Skins available: `button`, `chip`, `badge`, `tab`, `card`, `panel`, `dialog`,
+`popover`, `menu`, `alert`, `field`, `input`, `box`, `checkbox`, `radio`,
+`switch`, `thumb`, `row`, `divider`, `separator`, `progress`, `fill`,
+`avatar`, `skeleton`, `tape`. Each takes the usual `color`, `edge`, `seed`,
+`rot`, `amp` and `boil` options, plus `reset: false` to keep the host's own
+background, border, shadow and overflow.
+
+In React, `useScraps` ties an adapter to a component's lifetime, which is all a
+theme switch needs:
+
+```jsx
+import { useScraps } from 'scraps-ui/react'
+import 'scraps-ui/scraps.css'
+
+const PAPER = { '[data-slot="button"]': 'button', '[data-slot="card"]': 'card' }
+
+function Theme ({ children }) {
+  const { preset } = useTheme()
+  useScraps(PAPER, { enabled: preset === 'scraps' })
+  return children
+}
+```
+
+Define the map outside the component so it stays referentially stable. To
+paper a single element by hand, `Scraps.skin(el, 'card')`, and in plain markup
+`data-skin` on a `data-scrap` element opts it out of the wrapping builders.
+
 ## Tailwind
 
 In a Tailwind v4 project, import the bridge instead of the plain stylesheet:

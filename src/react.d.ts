@@ -1,5 +1,7 @@
 import * as React from 'react'
-import type { ScrapsApi } from './scraps'
+import type { ScrapsApi, ScrapAdaptMap, ScrapAdaptOptions } from './scraps'
+
+export type { ScrapSkin, ScrapSkinOptions, ScrapAdaptMap } from './scraps'
 
 export interface ScrapStyleProps {
   color?: string
@@ -45,6 +47,15 @@ export const reseed: ScrapsApi['reseed']
 export const tear: ScrapsApi['tear']
 export const setProgress: ScrapsApi['setProgress']
 export const registerColors: ScrapsApi['registerColors']
+export const skin: ScrapsApi['skin']
+export const adapt: ScrapsApi['adapt']
+export const unadapt: ScrapsApi['unadapt']
+
+/** papers a host design system for as long as the component is mounted */
+export function useScraps (
+  map: ScrapAdaptMap,
+  options?: ScrapAdaptOptions & { enabled?: boolean },
+): void
 export const fx: ScrapsApi['fx']
 
 declare const Scraps: ScrapsApi

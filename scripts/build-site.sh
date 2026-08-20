@@ -4,9 +4,9 @@
 set -e
 rm -rf public
 mkdir -p public
-cp demo/index.html demo/swatch-book.html demo/favicon.svg demo/og.png public/
+cp demo/index.html demo/swatch-book.html demo/adapter.html demo/favicon.svg demo/og.png public/
 cp src/scraps.js src/scraps.css public/
-for f in public/index.html public/swatch-book.html; do
+for f in public/index.html public/swatch-book.html public/adapter.html; do
   sed -i.bak 's#\.\./src/##g' "$f" && rm "$f.bak"
 done
 node scripts/build-registry.mjs
