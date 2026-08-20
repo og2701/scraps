@@ -57,21 +57,22 @@
    paper on elements scraps did not build (Scraps.adapt / Scraps.skin).
    structure only, so the host keeps its own display, layout and text color. */
 
-/* :where() keeps these at zero specificity: a host that positions or
-   transforms itself with its own classes must always win, whatever order
-   the stylesheets load in */
+/* isolation alone keeps the paper behind the host's own content, so nothing
+   here has to touch the position of the host's children. :where() keeps the
+   specificity at zero, though a host utility in a cascade layer beats these
+   whatever the specificity, which is why the anchor is decided in js */
 :where(.scrap-skin) {
-  position: relative;
   isolation: isolate;
 }
 
-:where(.scrap-skin) > :where(:not(.scrap-svg)) {
+/* only a host that positions nothing itself needs anchoring for the paper */
+:where(.scrap-skin-anchor) {
   position: relative;
-  z-index: 1;
 }
 
+/* rotate composes with the host's own transform instead of replacing it */
 :where(.scrap-skin-rot) {
-  transform: rotate(var(--scrap-rot, 0deg));
+  rotate: var(--scrap-rot, 0deg);
 }
 
 /* the host's own background, border and shadow would sit on top of the paper,
