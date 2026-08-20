@@ -203,6 +203,9 @@
     // display, color or component styling that would fight the host's own css
     if (rec.skin) {
       el.classList.add('scrap-skin', 'scrap-skin-' + type)
+      // the paper is positioned against the host, so a static host needs
+      // anchoring while one the app already positions must be left alone
+      if (getComputedStyle(el).position === 'static') el.classList.add('scrap-skin-anchor')
       // in clip mode the host's own background is the paper, so it stays
       if (o.reset !== false && rec.mode === 'svg') el.classList.add('scrap-skin-reset')
       if (o.ink && rec.mode === 'svg') el.classList.add('scrap-skin-text')
@@ -247,7 +250,7 @@
     if (rec.skin) {
       n.classList.remove(
         'scrap-skin', 'scrap-skin-' + rec.type,
-        'scrap-skin-reset', 'scrap-skin-rot', 'scrap-skin-text',
+        'scrap-skin-reset', 'scrap-skin-rot', 'scrap-skin-text', 'scrap-skin-anchor',
       )
       n.style.removeProperty('--scrap-rot')
       n.style.removeProperty('clip-path')
@@ -311,6 +314,10 @@
     rec.svg.setAttribute('viewBox', `${-B} ${-B} ${w + B * 2} ${h + B * 2}`)
     rec.svg.style.left = -B + 'px'
     rec.svg.style.top = -B + 'px'
+    // hosts routinely size every descendant svg (shadcn's [&_svg]:size-4), which
+    // would squash the paper, so it pins its own box inline
+    rec.svg.style.width = (w + B * 2) + 'px'
+    rec.svg.style.height = (h + B * 2) + 'px'
     rec.pFringe.setAttribute('d', dFringe)
     rec.pFace.setAttribute('d', dFace)
     rec.pGrain.setAttribute('d', dFace)
