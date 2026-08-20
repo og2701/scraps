@@ -125,6 +125,12 @@
     tape:     { edge: 'cut',  amp: 2.0, rot: 0,   boil: false },
   }
 
+  // an <input> takes no children and a <textarea>'s children are its value,
+  // so paper for these is cut out of the element itself instead of laid behind
+  const NO_CHILDREN = /^(INPUT|TEXTAREA|SELECT|IMG|HR|BR|AREA|EMBED|IFRAME|CANVAS|VIDEO|AUDIO|OBJECT|PROGRESS|METER)$/
+
+  const holdsPaper = el => !NO_CHILDREN.test(el.tagName)
+
   /* ---------------- attach & paint ---------------- */
 
   const recs = new Set()
@@ -152,8 +158,12 @@
     return e
   }
 
+  let defsDone = false
+
   function ensureDefs () {
-    if (document.getElementById('scraps-defs')) return
+    if (defsDone) return
+    if (!document.body) return
+    if (document.getElementById('scraps-defs')) { defsDone = true; return }
     const svg = svgEl('svg', { id: 'scraps-defs', width: 0, height: 0, 'aria-hidden': 'true' })
     svg.style.position = 'absolute'
     svg.innerHTML =
@@ -163,10 +173,12 @@
       '<feComposite in="a" in2="SourceAlpha" operator="in"/>' +
       '</filter></defs>'
     document.body.prepend(svg)
+    defsDone = true
   }
 
   function attach (el, type, o = {}) {
     if (el.__scrapRec) return el.__scrapRec
+    ensureDefs()
     const d = TYPES[type] || TYPES.card
     const ds = el.dataset
     const rec = {
@@ -178,18 +190,38 @@
       rot: ds.rot != null ? +ds.rot : (o.rot != null ? o.rot : d.rot),
       boil: ds.boil != null ? ds.boil !== 'false' : (o.boil != null ? o.boil : d.boil),
       shape: o.shape || null,
+      mode: o.mode || (holdsPaper(el) ? 'svg' : 'clip'),
+      skin: !!o.skin,
+      adapter: o.adapter || null,
+      color: o.color || ds.color || null,
       n: 0,
       svg: null,
       ac: typeof AbortController === 'function' ? new AbortController() : null,
     }
     el.__scrapRec = rec
-    el.classList.add('scrap', 'scrap-' + type)
-    const color = o.color || ds.color
-    if (color) el.classList.add('scrap--' + color)
+    // skin mode papers an element scraps did not build, so it adds none of the
+    // display, color or component styling that would fight the host's own css
+    if (rec.skin) {
+      el.classList.add('scrap-skin', 'scrap-skin-' + type)
+      // in clip mode the host's own background is the paper, so it stays
+      if (o.reset !== false && rec.mode === 'svg') el.classList.add('scrap-skin-reset')
+      if (o.ink && rec.mode === 'svg') el.classList.add('scrap-skin-text')
+      if (rec.rot) el.classList.add('scrap-skin-rot')
+    } else {
+      el.classList.add('scrap', 'scrap-' + type)
+    }
+    if (rec.color) el.classList.add('scrap--' + rec.color)
     recs.add(rec)
     paint(rec)
     if (ro) ro.observe(el)
-    if (mo) mo.observe(el, { childList: true })
+    // MutationObserver has no unobserve, so a skin gets its own: an adapted
+    // host element outlives its paper and must not stay registered forever
+    if (rec.skin && typeof MutationObserver === 'function') {
+      rec.mo = new MutationObserver(() => {
+        if (rec.svg && rec.svg.parentNode !== el) paint(rec)
+      })
+      rec.mo.observe(el, { childList: true })
+    } else if (mo) mo.observe(el, { childList: true })
     if (rec.boil) hookBoil(rec)
     if (ds.fx && FX[ds.fx]) el.addEventListener('click', () => FX[ds.fx](el), sig(rec))
     return rec
@@ -200,15 +232,30 @@
   function release (root) {
     if (!root || !root.querySelectorAll) return
     const nodes = [root, ...root.querySelectorAll('*')]
-    for (const n of nodes) {
-      const rec = n.__scrapRec
-      if (!rec) continue
-      if (rec.ac) rec.ac.abort()
-      if (ro) ro.unobserve(n)
-      if (rec.svg) rec.svg.remove()
-      recs.delete(rec)
-      delete n.__scrapRec
+    for (const n of nodes) releaseOne(n)
+  }
+
+  function releaseOne (n) {
+    const rec = n.__scrapRec
+    if (!rec) return
+    if (rec.ac) rec.ac.abort()
+    if (ro) ro.unobserve(n)
+    if (rec.mo) rec.mo.disconnect()
+    if (rec.svg) rec.svg.remove()
+    // a skinned host element stays in the page after its paper goes, so the
+    // reset classes have to come off or it keeps a transparent background
+    if (rec.skin) {
+      n.classList.remove(
+        'scrap-skin', 'scrap-skin-' + rec.type,
+        'scrap-skin-reset', 'scrap-skin-rot', 'scrap-skin-text',
+      )
+      n.style.removeProperty('--scrap-rot')
+      n.style.removeProperty('clip-path')
+      if (rec.color) n.classList.remove('scrap--' + rec.color)
     }
+    recs.delete(rec)
+    delete n.__scrapRec
+    delete n.__scrapSel
   }
 
   function paint (rec) {
@@ -238,6 +285,16 @@
     } else {
       dFace = pathFrom(rectPts(w, h, rA, rec.edge, rec.amp, 0))
       dFringe = pathFrom(rectPts(w, h, rB, rec.edge, rec.amp * 1.25, 1.5))
+    }
+
+    // clip mode has no paper of its own: the tear is cut out of the element,
+    // so the wobble runs inward or the edge would just be clipped away
+    if (rec.mode === 'clip') {
+      const pts = rectPts(w, h, rA, rec.edge, rec.amp, -rec.amp)
+      el.style.clipPath =
+        'polygon(' + pts.map(pt => pt[0].toFixed(1) + 'px ' + pt[1].toFixed(1) + 'px').join(',') + ')'
+      if (rec.rot) el.style.setProperty('--scrap-rot', ((rC() * 2 - 1) * rec.rot).toFixed(2) + 'deg')
+      return
     }
 
     if (!rec.svg) {
@@ -769,17 +826,19 @@
     wrap.classList.add('scrap-avatar-wrap')
   }
 
+  // loading paper never settles: a slow permanent boil
+  function slowBoil (rec) {
+    if (state.reduced) return
+    const iv = setInterval(() => {
+      if (!rec.el.isConnected) return clearInterval(iv)
+      rec.n++
+      paint(rec)
+    }, 1100)
+    if (rec.ac) rec.ac.signal.addEventListener('abort', () => clearInterval(iv))
+  }
+
   function buildSkeleton (el) {
-    const rec = attach(el, 'skeleton', { color: el.dataset.color || 'kraft' })
-    if (!state.reduced) {
-      // loading paper never settles: a slow permanent boil
-      const iv = setInterval(() => {
-        if (!el.isConnected) return clearInterval(iv)
-        rec.n++
-        paint(rec)
-      }, 1100)
-      if (rec.ac) rec.ac.signal.addEventListener('abort', () => clearInterval(iv))
-    }
+    slowBoil(attach(el, 'skeleton', { color: el.dataset.color || 'kraft' }))
   }
 
   function buildAlert (el) {
@@ -1055,6 +1114,7 @@
   function enhance (el) {
     if (el.__scrapRec) return
     const type = el.dataset.scrap || 'card'
+    if (el.dataset.skin != null) return void skin(el, type)
     ;(BUILDERS[type] || BUILDERS.card)(el)
   }
 
@@ -1081,10 +1141,180 @@
       }
       if (v.text && OK_COLOR.test(v.text)) {
         css += '\n.scrap--' + name + '{color:' + v.text + '}'
+        css += '\n.scrap-skin-text.scrap--' + name + '{color:' + v.text + ' !important}'
         css += '\n.scrap--' + name + ' > .scrap-svg .scrap-grain{fill:#fff}'
       }
     }
     sheet.textContent = css
+  }
+
+  /* ---------------- skins ----------------
+   * paper for elements scraps did not build. a skin is attach() and nothing
+   * more: no wrapper nodes, no adopted children, no behavior. that makes it
+   * safe on components a framework owns and re-renders, and it leaves the
+   * host's own accessibility, keyboard handling and layout alone.
+   */
+
+  const SKINS = {
+    button:    { type: 'button', ink: true },
+    chip:      { type: 'chip', ink: true },
+    badge:     { type: 'chip', ink: true },
+    tab:       { type: 'chip', color: 'kraft', rot: 1.5, ink: true },
+    card:      { type: 'card' },
+    panel:     { type: 'card', rot: 0.4 },
+    dialog:    { type: 'card', rot: 0.5 },
+    popover:   { type: 'card', rot: 0.5 },
+    menu:      { type: 'card', rot: 0.6 },
+    alert:     { type: 'card', color: 'kraft', rot: 0.8, ink: true },
+    field:     { type: 'field' },
+    input:     { type: 'field' },
+    box:       { type: 'box', ink: true },
+    checkbox:  { type: 'box', edge: 'cut', ink: true },
+    radio:     { type: 'box', edge: 'torn', shape: 'blob' },
+    switch:    { type: 'box', edge: 'cut', color: 'kraft' },
+    thumb:     { type: 'box', edge: 'torn', amp: 1.8, color: 'white' },
+    row:       { type: 'box', edge: 'torn', rot: 0, ink: true },
+    divider:   { type: 'divider' },
+    separator: { type: 'divider' },
+    progress:  { type: 'progress' },
+    fill:      { type: 'box', edge: 'torn', amp: 2.2, color: 'coral' },
+    avatar:    { type: 'avatar' },
+    skeleton:  { type: 'skeleton', pulse: true },
+    tape:      { type: 'tape' },
+  }
+
+  function skin (el, name, o) {
+    const s = SKINS[name] || SKINS.card
+    const opts = Object.assign({}, s, o, { skin: true })
+    delete opts.type
+    delete opts.pulse
+    const rec = attach(el, s.type, opts)
+    if (s.pulse) slowBoil(rec)
+    return rec
+  }
+
+  /* ---------------- adapter ----------------
+   * Scraps.adapt({ '[data-slot="button"]': 'button' }) papers a design system
+   * scraps knows nothing about. one observer watches the document, so paper
+   * reaches portalled dialogs and popovers the moment they mount, and comes
+   * off cleanly when they unmount or when the theme is switched away.
+   */
+
+  const adapters = new Set()
+  const task = typeof queueMicrotask === 'function' ? queueMicrotask : f => setTimeout(f, 0)
+  const ATTR_RE = /\[\s*([A-Za-z_:][-\w:.]*)/g
+
+  // only the attributes the map's own selectors read, so state flips like
+  // data-open or data-disabled are seen without watching every attribute
+  function watchedAttrs (sels) {
+    const out = new Set()
+    for (const sel of sels) {
+      let m
+      ATTR_RE.lastIndex = 0
+      while ((m = ATTR_RE.exec(sel))) out.add(m[1])
+      if (sel.indexOf('.') !== -1) out.add('class')
+    }
+    return [...out]
+  }
+
+  function adapt (map, o = {}) {
+    const entries = []
+    for (const sel in map) {
+      if (!map[sel]) continue
+      try { document.querySelector(sel) } catch (e) {
+        throw new Error('Scraps.adapt: not a valid selector: ' + sel)
+      }
+      entries.push({ sel, spec: typeof map[sel] === 'string' ? { type: map[sel] } : map[sel] })
+    }
+    if (!entries.length) return function noop () {}
+
+    const all = entries.map(e => e.sel).join(',')
+    const root = o.root || document
+    const pending = new Set()
+    const gone = new Set()
+    let queued = false
+
+    // later entries win, so '[data-slot=button][data-disabled]' can override
+    // the plain '[data-slot=button]' listed above it
+    const match = el => {
+      let hit = null
+      for (const e of entries) if (el.matches(e.sel)) hit = e
+      return hit
+    }
+
+    const apply = el => {
+      // an element papered by a builder or another adapter is not ours to move
+      if (el.__scrapRec && el.__scrapRec.adapter !== stop) return
+      const hit = match(el)
+      if (!hit) return void (el.__scrapSel && releaseOne(el))
+      if (el.__scrapSel === hit.sel) return
+      if (el.__scrapRec) releaseOne(el)
+      el.__scrapSel = hit.sel
+      skin(el, hit.spec.type || 'card', Object.assign({ adapter: stop }, hit.spec))
+    }
+
+    const collect = node => {
+      if (node.nodeType !== 1) return
+      if (node.matches(all)) pending.add(node)
+      const found = node.querySelectorAll(all)
+      for (let i = 0; i < found.length; i++) pending.add(found[i])
+    }
+
+    const flush = () => {
+      queued = false
+      // a moved node is reported as removed and added in the same batch, so
+      // only the ones still out of the document are really gone
+      for (const n of gone) if (!n.isConnected) release(n)
+      gone.clear()
+      for (const n of pending) if (n.isConnected) apply(n)
+      pending.clear()
+    }
+
+    const queue = () => {
+      if (queued) return
+      queued = true
+      task(flush)
+    }
+
+    const obs = typeof MutationObserver === 'function'
+      ? new MutationObserver(muts => {
+          for (const m of muts) {
+            if (m.type === 'attributes') { pending.add(m.target); continue }
+            for (const n of m.addedNodes) collect(n)
+            for (const n of m.removedNodes) if (n.nodeType === 1) gone.add(n)
+          }
+          queue()
+        })
+      : null
+
+    function stop () {
+      if (!adapters.has(stop)) return
+      adapters.delete(stop)
+      if (obs) obs.disconnect()
+      pending.clear()
+      gone.clear()
+      for (const rec of [...recs]) if (rec.adapter === stop) releaseOne(rec.el)
+    }
+
+    adapters.add(stop)
+    ensureDefs()
+    collect(root.documentElement || root)
+    flush()
+
+    if (obs) {
+      const init = { childList: true, subtree: true }
+      const attrs = watchedAttrs(entries.map(e => e.sel))
+      if (attrs.length) {
+        init.attributes = true
+        init.attributeFilter = attrs
+      }
+      obs.observe(root.documentElement || root, init)
+    }
+    return stop
+  }
+
+  function unadapt () {
+    for (const stop of [...adapters]) stop()
   }
 
   /* ---------------- public api ---------------- */
@@ -1110,6 +1340,9 @@
     init,
     enhance,
     attach,
+    skin,
+    adapt,
+    unadapt,
     release,
     tear,
     reseed,
