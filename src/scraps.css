@@ -57,17 +57,20 @@
    paper on elements scraps did not build (Scraps.adapt / Scraps.skin).
    structure only, so the host keeps its own display, layout and text color. */
 
-.scrap-skin {
+/* :where() keeps these at zero specificity: a host that positions or
+   transforms itself with its own classes must always win, whatever order
+   the stylesheets load in */
+:where(.scrap-skin) {
   position: relative;
   isolation: isolate;
 }
 
-.scrap-skin > *:not(.scrap-svg) {
+:where(.scrap-skin) > :where(:not(.scrap-svg)) {
   position: relative;
   z-index: 1;
 }
 
-.scrap-skin-rot {
+:where(.scrap-skin-rot) {
   transform: rotate(var(--scrap-rot, 0deg));
 }
 
